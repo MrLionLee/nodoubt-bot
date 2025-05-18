@@ -1,6 +1,5 @@
 import {
     UIMessage,
-    appendResponseMessages,
     createDataStreamResponse,
     smoothStream,
     streamText,
@@ -19,7 +18,6 @@ import {
 export async function POST(request: Request) {
     try {
         const {
-            id,
             messages,
             selectedChatModel,
         }: {
@@ -141,14 +139,12 @@ export async function POST(request: Request) {
                     sendReasoning: true,
                 }); // 合并数据流
             },
-            onError: (e) => {
+            onError: () => {
                 return 'Oops, an error occurred!';
             },
         });
-
-
     } catch (error) {
-        return new Response('An error occurred while processing your request!', {
+        return new Response('An error occurred while processing your request!' + error, {
             status: 404,
         });
     }

@@ -7,10 +7,9 @@ import { useLocalStorageState,useSize } from 'ahooks';
 import { Input } from 'antd';
 const TextArea = Input.TextArea;
 import {
-  useRef, useState, 
+  useRef, 
   type Dispatch,
   type SetStateAction,
-  type ChangeEvent,
   useCallback,
   useEffect
 } from 'react';
@@ -24,12 +23,12 @@ export function MultimodelInput({
   input,
   setInput,
   status,
-  stop,
+  // stop,
   attachments,
   setAttachments,
-  messages,
-  setMessages,
-  append,
+  // messages,
+  // setMessages,
+  // append,
   handleSubmit,
   className,
 }: {
@@ -51,10 +50,15 @@ export function MultimodelInput({
   const width = size?.width
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   // 替换原有textareaRef逻辑
-  const [autoSize, setAutoSize] = useState<boolean | { minRows: number, maxRows: number }>({
+  // const [autoSize, setAutoSize] = useState<boolean | { minRows: number, maxRows: number }>({
+  //   minRows: 2,
+  //   maxRows: 8
+  // });
+
+  const autoSize = {
     minRows: 2,
     maxRows: 8
-  });
+  }
   const handleInput = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     console.info('handleInput', event.target.value)
     setInput(event.target.value);
@@ -82,7 +86,7 @@ export function MultimodelInput({
 
   const submitForm = useCallback(() => {
     // 更新浏览器 url 
-    // window.history.replaceState({}, '', `/chat/${chatId}`);
+    window.history.replaceState({}, '', `/chat/${chatId}`);
 
     //  提交消息（携带附件）
     handleSubmit(undefined, {
