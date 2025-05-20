@@ -72,7 +72,6 @@ export function getChatHistoryPaginationKey(
     pageIndex: number,
     previousPageData: ChatHistory,
   ) {
-    console.info('getChatHistoryPaginationKey', pageIndex, previousPageData);
     const PAGE_SIZE = 10;
     if (previousPageData && previousPageData.hasMore === false) {
       return null;

@@ -4,16 +4,18 @@ import {
     smoothStream,
     streamText,
 } from 'ai';
-import {   
+import {
     generateUUID,
     // getMostRecentUserMessage,
     // getTrailingMessageId,
-  } from '@/lib/utils';
-  import { systemPrompt } from '@/lib/ai/prompts';
-  import { myProvider } from '@/lib/ai/providers';
-  import {isProductionEnvironment} from '@/lib/constants'
-import {getChatById , saveChat} from '@/lib/db/queries'
-
+    
+} from '@/lib/utils';
+import { systemPrompt } from '@/lib/ai/prompts';
+import { myProvider } from '@/lib/ai/providers';
+import { isProductionEnvironment } from '@/lib/constants'
+import { getChatById, saveChat, saveMessages } from '@/lib/db/queries'
+import { generateTitleFromUserMessage } from './actions'
+import { getMostRecentUserMessage } from '@/lib/utils'
 
 export async function POST(request: Request) {
     try {
@@ -27,17 +29,40 @@ export async function POST(request: Request) {
             selectedChatModel: string;
         } = await request.json();
 
+        console.info('POST request body:', JSON.stringify({ id, messages, selectedChatModel }, null, 2));
 
         // update chat history
         const chat = await getChatById({ id });
 
-        // if (!chat) {
-        //   const title = await generateTitleFromUserMessage({
-        //     message: userMessage,
+        const userMessage = getMostRecentUserMessage(messages);
+
+        console.info('userMessage:', JSON.stringify(userMessage, null, 2));
+        if (!userMessage) {
+            return new Response('No user message found', { status: 400 });
+          }
+
+        if (!chat) {
+            const title = await generateTitleFromUserMessage({
+                message: userMessage,
+            });
+
+            await saveChat({ id, title });
+        }
+
+        // 保存 messages
+        // await saveMessages({
+        //     messages: [
+        //       {
+        //         chatId: id,
+        //         id: userMessage.id,
+        //         role: 'user',
+        //         parts: userMessage.parts,
+        //         attachments: userMessage.experimental_attachments ?? [],
+        //         createdAt: new Date(),
+        //       },
+        //     ],
         //   });
-    
-        //   await saveChat({ id, title });
-        // } 
+        
 
 
         // 调用 AI 模型进行对话
@@ -49,15 +74,15 @@ export async function POST(request: Request) {
                     system: systemPrompt({ selectedChatModel }),
                     messages,
                     maxSteps: 5,
-                    experimental_activeTools:[],
-                        // selectedChatModel === 'chat-model-reasoning'
-                        //     ? []
-                        //     : [
-                        //         'getWeather',
-                        //         // 'createDocument',
-                        //         // 'updateDocument',
-                        //         // 'requestSuggestions',
-                        //     ],
+                    experimental_activeTools: [],
+                    // selectedChatModel === 'chat-model-reasoning'
+                    //     ? []
+                    //     : [
+                    //         'getWeather',
+                    //         // 'createDocument',
+                    //         // 'updateDocument',
+                    //         // 'requestSuggestions',
+                    //     ],
                     experimental_transform: smoothStream({ chunking: 'word' }),
                     experimental_generateMessageId: generateUUID,
                     // 这里的 tools 需要和对应的 modal 匹配

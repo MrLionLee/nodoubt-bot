@@ -4,6 +4,7 @@ import { AppSidebar } from '@/components/sidebar/app-sidebar';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 // import { auth } from '../(auth)/auth';
 import Script from 'next/script';
+import { mockUser } from '@/lib/constants';
 
 
 export const experimental_ppr = true;
@@ -16,7 +17,7 @@ export default async function Layout({
     //   const [session, cookieStore] = await Promise.all([auth(), cookies()]);
     //   const isCollapsed = cookieStore.get('sidebar:state')?.value !== 'true';
 
-
+    console.info('chat layout')
     return (
         <>
             <Script
@@ -24,9 +25,7 @@ export default async function Layout({
                 strategy="beforeInteractive"
             />
             <SidebarProvider >
-                <AppSidebar user={{
-                    id: 'guest'
-                }} />
+                <AppSidebar user={mockUser} />
                 <SidebarInset>
                     {children}
                 </SidebarInset>

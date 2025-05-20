@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { getChatsByUserId } from '@/lib/db/queries';
+import { mockUser } from '@/lib/constants';
 
 const mock = {
     "chats": [
@@ -50,12 +51,11 @@ export async function GET(request: NextRequest) {
 
 
 
-    return Response.json(mock)
 
     try {
         const chats = await getChatsByUserId({
             //   id: session.user.id,
-            id: 'test_chat_id',
+            id: mockUser.id,
             limit,
             startingAfter,
             endingBefore,

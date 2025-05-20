@@ -1,6 +1,8 @@
 import { twMerge } from 'tailwind-merge';
 import { type ClassValue, clsx } from 'clsx';
 
+import { UIMessage } from 'ai';
+
 interface ApplicationError extends Error {
     info: string;
     status: number;
@@ -35,3 +37,9 @@ export const fetcher = async (url: string) => {
 
     return res.json();
 };
+
+// 筛选出那些 user 发出的 message，然后取最后一个
+export function getMostRecentUserMessage(messages: Array<UIMessage>) {
+    const userMessages = messages.filter((message) => message.role === 'user');
+    return userMessages.at(-1);
+  }

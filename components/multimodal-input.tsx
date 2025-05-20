@@ -60,7 +60,6 @@ export function MultimodelInput({
     maxRows: 8
   }
   const handleInput = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    console.info('handleInput', event.target.value)
     setInput(event.target.value);
     // adjustHeight();
   };
