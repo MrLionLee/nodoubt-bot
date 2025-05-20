@@ -12,12 +12,13 @@ import {
   import { systemPrompt } from '@/lib/ai/prompts';
   import { myProvider } from '@/lib/ai/providers';
   import {isProductionEnvironment} from '@/lib/constants'
-
+import {getChatById , saveChat} from '@/lib/db/queries'
 
 
 export async function POST(request: Request) {
     try {
         const {
+            id,
             messages,
             selectedChatModel,
         }: {
@@ -25,6 +26,18 @@ export async function POST(request: Request) {
             messages: Array<UIMessage>;
             selectedChatModel: string;
         } = await request.json();
+
+
+        // update chat history
+        const chat = await getChatById({ id });
+
+        // if (!chat) {
+        //   const title = await generateTitleFromUserMessage({
+        //     message: userMessage,
+        //   });
+    
+        //   await saveChat({ id, title });
+        // } 
 
 
         // 调用 AI 模型进行对话
