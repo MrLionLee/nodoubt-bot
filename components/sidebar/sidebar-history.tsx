@@ -12,85 +12,98 @@ import type { Chat } from '@/lib/db/schema';
 import { motion } from 'motion/react';
 import { LoaderIcon } from '../icons';
 import { ChatItem } from './sidebar-history-item';
+import { toast } from 'sonner';
+
 import {
-    SidebarGroup,
-    SidebarGroupContent,
-    SidebarMenu,
-  } from '@/components/ui/sidebar';
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarMenu,
+} from '@/components/ui/sidebar';
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 
-  type GroupedChats = {
-    today: Chat[];
-    yesterday: Chat[];
-    lastWeek: Chat[];
-    lastMonth: Chat[];
-    older: Chat[];
-  };
-  
-  export interface ChatHistory {
-    chats: Array<Chat>;
-    hasMore: boolean;
-  }
-  
-  const PAGE_SIZE = 20;
+type GroupedChats = {
+  today: Chat[];
+  yesterday: Chat[];
+  lastWeek: Chat[];
+  lastMonth: Chat[];
+  older: Chat[];
+};
 
-  const groupChatsByDate = (chats: Chat[]): GroupedChats => {
-    const now = new Date();
-    const oneWeekAgo = subWeeks(now, 1);
-    const oneMonthAgo = subMonths(now, 1);
-  
-    return chats.reduce(
-      (groups, chat) => {
-        const chatDate = new Date(chat.createdAt);
-  
-        if (isToday(chatDate)) {
-          groups.today.push(chat);
-        } else if (isYesterday(chatDate)) {
-          groups.yesterday.push(chat);
-        } else if (chatDate > oneWeekAgo) {
-          groups.lastWeek.push(chat);
-        } else if (chatDate > oneMonthAgo) {
-          groups.lastMonth.push(chat);
-        } else {
-          groups.older.push(chat);
-        }
-  
-        return groups;
-      },
-      {
-        today: [],
-        yesterday: [],
-        lastWeek: [],
-        lastMonth: [],
-        older: [],
-      } as GroupedChats,
-    );
-  };
+export interface ChatHistory {
+  chats: Array<Chat>;
+  hasMore: boolean;
+}
+
+const PAGE_SIZE = 20;
+
+const groupChatsByDate = (chats: Chat[]): GroupedChats => {
+  const now = new Date();
+  const oneWeekAgo = subWeeks(now, 1);
+  const oneMonthAgo = subMonths(now, 1);
+
+  return chats.reduce(
+    (groups, chat) => {
+      const chatDate = new Date(chat.createdAt);
+
+      if (isToday(chatDate)) {
+        groups.today.push(chat);
+      } else if (isYesterday(chatDate)) {
+        groups.yesterday.push(chat);
+      } else if (chatDate > oneWeekAgo) {
+        groups.lastWeek.push(chat);
+      } else if (chatDate > oneMonthAgo) {
+        groups.lastMonth.push(chat);
+      } else {
+        groups.older.push(chat);
+      }
+
+      return groups;
+    },
+    {
+      today: [],
+      yesterday: [],
+      lastWeek: [],
+      lastMonth: [],
+      older: [],
+    } as GroupedChats,
+  );
+};
 
 
 export function getChatHistoryPaginationKey(
-    pageIndex: number,
-    previousPageData: ChatHistory,
-  ) {
-    const PAGE_SIZE = 10;
-    if (previousPageData && previousPageData.hasMore === false) {
-      return null;
-    }
-  
-    if (pageIndex === 0) return `/api/history?limit=${PAGE_SIZE}`;
-  
-    const firstChatFromPage = previousPageData.chats.at(-1);
-  
-    if (!firstChatFromPage) return null;
-  
-    return `/api/history?ending_before=${firstChatFromPage.id}&limit=${PAGE_SIZE}`;
+  pageIndex: number,
+  previousPageData: ChatHistory,
+) {
+  const PAGE_SIZE = 10;
+  if (previousPageData && previousPageData.hasMore === false) {
+    return null;
   }
+
+  if (pageIndex === 0) return `/api/history?limit=${PAGE_SIZE}`;
+
+  const firstChatFromPage = previousPageData.chats.at(-1);
+
+  if (!firstChatFromPage) return null;
+
+  return `/api/history?ending_before=${firstChatFromPage.id}&limit=${PAGE_SIZE}`;
+}
 
 
 export interface ChatHistory {
-    chats: Array<Chat>;
-    hasMore: boolean;
-  }
+  chats: Array<Chat>;
+  hasMore: boolean;
+}
 
 export function SidebarHistory({ user }: { user: User | undefined }) {
   const { id } = useParams();
@@ -110,14 +123,45 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const hasReachedEnd = paginatedChatHistories
-  ? paginatedChatHistories.some((page) => page.hasMore === false)
-  : false;
+    ? paginatedChatHistories.some((page) => page.hasMore === false)
+    : false;
 
 
   const hasEmptyChatHistory = paginatedChatHistories
-  ? paginatedChatHistories.every((page) => page.chats.length === 0)
-  : false;
+    ? paginatedChatHistories.every((page) => page.chats.length === 0)
+    : false;
 
+    const handleDelete = async () => {
+      const deletePromise = fetch(`/api/chat?id=${deleteId}`, {
+        method: 'DELETE',
+      });
+  
+      toast.promise(deletePromise, {
+        loading: 'Deleting chat...',
+        success: () => {
+          // delete 方法执行成功后，调用 mutate 方法更新缓存数据
+          mutate((chatHistories) => {
+            console.info('chatHistories', chatHistories,deleteId);
+            if (chatHistories) {
+              return chatHistories.map((chatHistory) => ({
+                ...chatHistory,
+                chats: chatHistory.chats.filter((chat) => chat.id !== deleteId),
+              }));
+            }
+          });
+  
+          return 'Chat deleted successfully';
+        },
+        error: 'Failed to delete chat',
+      });
+  
+      setShowDeleteDialog(false);
+  
+      // 如果是在详情页中，则返回到首页
+      if (deleteId === id) {
+        router.push('/');
+      }
+    };
   if (!user) {
     return (
       <SidebarGroup>
@@ -281,7 +325,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
         </SidebarGroupContent>
       </SidebarGroup>
 
-      {/* <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
@@ -297,7 +341,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
-      </AlertDialog> */}
+      </AlertDialog>
     </>
   );
 }

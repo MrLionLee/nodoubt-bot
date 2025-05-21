@@ -1,33 +1,6 @@
 import { NextRequest } from 'next/server';
 import { getChatsByUserId } from '@/lib/db/queries';
-import { mockUser } from '@/lib/constants';
-
-const mock = {
-    "chats": [
-        {
-            "id": "e5c3ed94-72d8-469f-9e72-d200d0f2fe5e",
-            "createdAt": "2025-05-18T07:49:37.683Z",
-            "title": "为什么天是蓝色的",
-            "userId": "4b28dece-18c2-418c-ad7c-05e0c0b9954a",
-            "visibility": "private"
-        },
-        {
-            "id": "1c64a025-1103-4ae1-bf56-bd3e2e6e1d8d",
-            "createdAt": "2025-05-17T10:06:15.448Z",
-            "title": "Greeting",
-            "userId": "4b28dece-18c2-418c-ad7c-05e0c0b9954a",
-            "visibility": "private"
-        },
-        {
-            "id": "81e329bb-767f-4bb3-b35b-29fd5ea3a147",
-            "createdAt": "2025-05-17T08:47:40.312Z",
-            "title": "Greeting a loved one",
-            "userId": "4b28dece-18c2-418c-ad7c-05e0c0b9954a",
-            "visibility": "private"
-        }
-    ],
-    "hasMore": false
-}
+import { auth } from '@/app/(auth)/auth';
 
 export async function GET(request: NextRequest) {
     const { searchParams } = request.nextUrl;
@@ -43,19 +16,15 @@ export async function GET(request: NextRequest) {
         );
     }
 
-    //   const session = await auth();
+      const session = await auth();
 
-    //   if (!session?.user?.id) {
-    //     return Response.json('Unauthorized!', { status: 401 });
-    //   }
-
-
-
+      if (!session?.user?.id) {
+        return Response.json('Unauthorized!', { status: 401 });
+      }
 
     try {
         const chats = await getChatsByUserId({
-            //   id: session.user.id,
-            id: mockUser.id,
+            id: session.user.id,
             limit,
             startingAfter,
             endingBefore,

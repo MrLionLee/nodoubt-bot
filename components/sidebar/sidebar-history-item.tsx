@@ -1,10 +1,25 @@
 
 import { Chat } from '@/lib/db/schema';
 import {
-    SidebarMenuAction,
     SidebarMenuButton,
     SidebarMenuItem,
-  } from '@/components/ui/sidebar';
+    SidebarMenuAction
+} from '@/components/ui/sidebar';
+
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuPortal,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+    TrashIcon,
+    MoreHorizontalIcon
+} from '@/components/icons';
 import Link from 'next/link';
 
 
@@ -17,11 +32,6 @@ const ChatItem = ({
     isActive: boolean;
     onDelete: (chatId: string) => void;
 }) => {
-    // const { visibilityType, setVisibilityType } = useChatVisibility({
-    //     chatId: chat.id,
-    //     initialVisibility: chat.visibility,
-    // });
-
     return (
         <SidebarMenuItem>
             <SidebarMenuButton asChild isActive={isActive}>
@@ -30,7 +40,7 @@ const ChatItem = ({
                 </Link>
             </SidebarMenuButton>
 
-            {/* <DropdownMenu modal={true}>
+            <DropdownMenu modal={true}>
                 <DropdownMenuTrigger asChild>
                     <SidebarMenuAction
                         className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground mr-0.5"
@@ -41,44 +51,8 @@ const ChatItem = ({
                     </SidebarMenuAction>
                 </DropdownMenuTrigger>
 
-                <DropdownMenuContent side="bottom" align="end">
-                    <DropdownMenuSub>
-                        <DropdownMenuSubTrigger className="cursor-pointer">
-                            <ShareIcon />
-                            <span>Share</span>
-                        </DropdownMenuSubTrigger>
-                        <DropdownMenuPortal>
-                            <DropdownMenuSubContent>
-                                <DropdownMenuItem
-                                    className="cursor-pointer flex-row justify-between"
-                                    onClick={() => {
-                                        setVisibilityType('private');
-                                    }}
-                                >
-                                    <div className="flex flex-row gap-2 items-center">
-                                        <LockIcon size={12} />
-                                        <span>Private</span>
-                                    </div>
-                                    {visibilityType === 'private' ? (
-                                        <CheckCircleFillIcon />
-                                    ) : null}
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                    className="cursor-pointer flex-row justify-between"
-                                    onClick={() => {
-                                        setVisibilityType('public');
-                                    }}
-                                >
-                                    <div className="flex flex-row gap-2 items-center">
-                                        <GlobeIcon />
-                                        <span>Public</span>
-                                    </div>
-                                    {visibilityType === 'public' ? <CheckCircleFillIcon /> : null}
-                                </DropdownMenuItem>
-                            </DropdownMenuSubContent>
-                        </DropdownMenuPortal>
-                    </DropdownMenuSub>
 
+                <DropdownMenuContent side="bottom" align="end">
                     <DropdownMenuItem
                         className="cursor-pointer text-destructive focus:bg-destructive/15 focus:text-destructive dark:text-red-500"
                         onSelect={() => onDelete(chat.id)}
@@ -87,7 +61,7 @@ const ChatItem = ({
                         <span>Delete</span>
                     </DropdownMenuItem>
                 </DropdownMenuContent>
-            </DropdownMenu> */}
+            </DropdownMenu>
         </SidebarMenuItem>
     );
 };

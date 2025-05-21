@@ -8,14 +8,16 @@ import {
     generateUUID,
     // getMostRecentUserMessage,
     // getTrailingMessageId,
-    
+
 } from '@/lib/utils';
 import { systemPrompt } from '@/lib/ai/prompts';
 import { myProvider } from '@/lib/ai/providers';
 import { isProductionEnvironment } from '@/lib/constants'
-import { getChatById, saveChat, saveMessages } from '@/lib/db/queries'
+import { getChatById, saveChat, saveMessages, deleteChatById } from '@/lib/db/queries'
 import { generateTitleFromUserMessage } from './actions'
 import { getMostRecentUserMessage } from '@/lib/utils'
+import { auth } from '@/app/(auth)/auth';
+
 
 export async function POST(request: Request) {
     try {
@@ -29,6 +31,12 @@ export async function POST(request: Request) {
             selectedChatModel: string;
         } = await request.json();
 
+        const session = await auth();
+
+        if (!session || !session.user || !session.user.id) {
+            return new Response('Unauthorized, session is empty', { status: 401 });
+        }
+
         console.info('POST request body:', JSON.stringify({ id, messages, selectedChatModel }, null, 2));
 
         // update chat history
@@ -39,14 +47,14 @@ export async function POST(request: Request) {
         console.info('userMessage:', JSON.stringify(userMessage, null, 2));
         if (!userMessage) {
             return new Response('No user message found', { status: 400 });
-          }
+        }
 
         if (!chat) {
             const title = await generateTitleFromUserMessage({
                 message: userMessage,
             });
 
-            await saveChat({ id, title });
+            await saveChat({ id, title, userId: session.user.id, });
         }
 
         // 保存 messages
@@ -62,7 +70,7 @@ export async function POST(request: Request) {
         //       },
         //     ],
         //   });
-        
+
 
 
         // 调用 AI 模型进行对话
@@ -186,4 +194,37 @@ export async function POST(request: Request) {
             status: 404,
         });
     }
-} 
+}
+
+
+export async function DELETE(request: Request) {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+        return new Response('Not Found', { status: 404 });
+    }
+
+    const session = await auth();
+
+    if (!session || !session.user) {
+        return new Response('Unauthorized ', { status: 401 });
+    }
+
+    try {
+        const chat = await getChatById({ id });
+
+        // chat 所属 userId 和当前用户不一致，则没有权限移除
+        if (chat.userId !== session.user.id) {
+            return new Response('Unauthorized, current chat is not belong to user', { status: 401 });
+        }
+
+          await deleteChatById({ id });
+
+        return new Response('Chat deleted', { status: 200 });
+    } catch (error) {
+        return new Response('An error occurred while processing your request!', {
+            status: 500,
+        });
+    }
+}

@@ -14,8 +14,6 @@ import {
     user,
     type User,
 } from './schema';
-import { mockUser } from '../constants';
-import { todo } from 'node:test';
 
 // biome-ignore lint: Forbidden non-null assertion.
 const client = postgres(process.env.POSTGRES_URL!);
@@ -23,40 +21,38 @@ const db = drizzle(client);
 
 export async function getUser(email: string): Promise<Array<User>> {
     try {
-      return await db.select().from(user).where(eq(user.email, email));
+        return await db.select().from(user).where(eq(user.email, email));
     } catch (error) {
-      console.error('Failed to get user from database');
-      throw error;
+        console.error('Failed to get user from database');
+        throw error;
     }
-  }
-  
-  export async function createUser(email: string, password: string) {
+}
+
+export async function createUser(email: string, password: string) {
     const salt = genSaltSync(10);
     const hash = hashSync(password, salt);
-  
+
     try {
-      return await db.insert(user).values({ email, password: hash });
+        return await db.insert(user).values({ email, password: hash });
     } catch (error) {
-      console.error('Failed to create user in database');
-      throw error;
+        console.error('Failed to create user in database');
+        throw error;
     }
-  }
+}
 
 
 
 // === chat
 
-
 export async function saveChat({
     id,
-    userId = mockUser.id, // 鉴权之前，先使用固定的值,
+    userId,
     title,
 }: {
     id: string;
-    userId?: string; // 鉴权之前，先使用固定的值
+    userId: string; // 鉴权之前，先使用固定的值
     title: string;
 }) {
-    console.info('saveChat', id, userId, title)
     try {
         return await db.insert(chat).values({
             id,
@@ -65,7 +61,7 @@ export async function saveChat({
             title,
         });
     } catch (error) {
-        console.error('Failed to save chat in database',error);
+        console.error('Failed to save chat in database', error);
         throw error;
     }
 }
@@ -76,7 +72,19 @@ export async function getChatById({ id }: { id: string }) {
         const [selectedChat] = await db.select().from(chat).where(eq(chat.id, id));
         return selectedChat;
     } catch (error) {
-        console.error('Failed to get chat by id from database',error);
+        console.error('Failed to get chat by id from database', error);
+        throw error;
+    }
+}
+
+export async function deleteChatById({ id }: { id: string }) {
+    try {
+        // 移除 chatId 对应的 message
+        await db.delete(message).where(eq(message.chatId, id));
+        // 移除 chat
+        return await db.delete(chat).where(eq(chat.id, id));
+    } catch (error) {
+        console.error('Failed to delete chat by id from database');
         throw error;
     }
 }
