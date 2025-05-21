@@ -18,13 +18,16 @@ export const user = pgTable('User', {
   password: varchar('password', { length: 64 }),
 });
 
+export type User = InferSelectModel<typeof user>;
+
+
 export const chat = pgTable('Chat', {
     id: uuid('id').primaryKey().notNull().defaultRandom(),
     createdAt: timestamp('createdAt').notNull(),
     title: text('title').notNull(),
     userId: uuid('userId')
-      .notNull(),
-      // .references(() => user.id),
+      .notNull()
+      .references(() => user.id),
     visibility: varchar('visibility', { enum: ['public', 'private'] })
       .notNull()
       .default('private'),

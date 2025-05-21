@@ -8,7 +8,7 @@ export const isTestEnvironment = Boolean(
 
 
 export const mockUser = {
-  "email": "guest-1747471637160",
-  "id": "4b28dece-18c2-418c-ad7c-05e0c0b9954a",
+  "email": "test-user@gmail.com",
+  "id": "447e1a55d-55b5-4aa7-a653-0bcb56f03365",
   "type": "guest"
 }
