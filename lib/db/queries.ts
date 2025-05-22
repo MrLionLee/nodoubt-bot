@@ -98,7 +98,7 @@ export async function getChatsByUserId({
     startingAfter,
     endingBefore,
 }: {
-    id: string; // userId
+    id: string;
     limit: number;
     startingAfter: string | null;
     endingBefore: string | null;
@@ -110,12 +110,11 @@ export async function getChatsByUserId({
             db
                 .select()
                 .from(chat)
-                // todo: 等 user db 配置好了，再补充
-                // .where(
-                //     whereCondition
-                //         ? and(whereCondition, eq(chat.userId, id))
-                //         : eq(chat.userId, id),
-                // )
+                .where(
+                    whereCondition
+                        ? and(whereCondition, eq(chat.userId, id))
+                        : eq(chat.userId, id),
+                )
                 .orderBy(desc(chat.createdAt))
                 .limit(extendedLimit);
 
@@ -175,6 +174,19 @@ export async function saveMessages({
         return await db.insert(message).values(messages);
     } catch (error) {
         console.error('Failed to save messages in database', error);
+        throw error;
+    }
+}
+
+export async function getMessagesByChatId({ id }: { id: string }) {
+    try {
+        return await db
+            .select()
+            .from(message)
+            .where(eq(message.chatId, id))
+            .orderBy(asc(message.createdAt));
+    } catch (error) {
+        console.error('Failed to get messages by chat id from database', error);
         throw error;
     }
 }
