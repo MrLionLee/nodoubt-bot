@@ -18,8 +18,8 @@ const runMigrate = async () => {
   console.log('⏳ Running migrations...');
 
   const start = Date.now();
-// 该错误通常是由于依赖版本不兼容导致的，尝试通过类型断言绕过类型检查
-await migrate(db as any, { migrationsFolder: './lib/db/migrations' });
+  // 该错误通常是由于依赖版本不兼容导致的，尝试通过类型断言绕过类型检查
+  await migrate(db, { migrationsFolder: './lib/db/migrations' });
   const end = Date.now();
 
   console.log('✅ Migrations completed in', end - start, 'ms');

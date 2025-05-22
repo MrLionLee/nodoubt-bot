@@ -7,7 +7,7 @@ import { SidebarUserNav } from '@/components/sidebar/sidebar-user-nav';
 
 
 import Link from 'next/link';
-import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components//ui/tooltip';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components//ui/tooltip';
 import { PlusIcon } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 

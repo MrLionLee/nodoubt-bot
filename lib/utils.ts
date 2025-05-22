@@ -1,7 +1,15 @@
 import { twMerge } from 'tailwind-merge';
 import { type ClassValue, clsx } from 'clsx';
 
-import { UIMessage } from 'ai';
+import {
+    UIMessage,
+    CoreAssistantMessage,
+    CoreToolMessage,
+} from 'ai';
+
+type ResponseMessageWithoutId = CoreToolMessage | CoreAssistantMessage;
+type ResponseMessage = ResponseMessageWithoutId & { id: string };
+
 
 interface ApplicationError extends Error {
     info: string;
@@ -42,4 +50,16 @@ export const fetcher = async (url: string) => {
 export function getMostRecentUserMessage(messages: Array<UIMessage>) {
     const userMessages = messages.filter((message) => message.role === 'user');
     return userMessages.at(-1);
-  }
+}
+
+export function getTrailingMessageId({
+    messages,
+}: {
+    messages: Array<ResponseMessage>;
+}): string | null {
+    const trailingMessage = messages.at(-1);
+
+    if (!trailingMessage) return null;
+
+    return trailingMessage.id;
+}

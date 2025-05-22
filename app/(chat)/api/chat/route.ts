@@ -1,21 +1,20 @@
 import {
     UIMessage,
     createDataStreamResponse,
+    appendResponseMessages,
     smoothStream,
     streamText,
 } from 'ai';
 import {
     generateUUID,
-    // getMostRecentUserMessage,
-    // getTrailingMessageId,
-
+    getMostRecentUserMessage,
+    getTrailingMessageId,
 } from '@/lib/utils';
 import { systemPrompt } from '@/lib/ai/prompts';
 import { myProvider } from '@/lib/ai/providers';
 import { isProductionEnvironment } from '@/lib/constants'
 import { getChatById, saveChat, saveMessages, deleteChatById } from '@/lib/db/queries'
 import { generateTitleFromUserMessage } from './actions'
-import { getMostRecentUserMessage } from '@/lib/utils'
 import { auth } from '@/app/(auth)/auth';
 
 
@@ -37,14 +36,11 @@ export async function POST(request: Request) {
             return new Response('Unauthorized, session is empty', { status: 401 });
         }
 
-        console.info('POST request body:', JSON.stringify({ id, messages, selectedChatModel }, null, 2));
-
         // update chat history
         const chat = await getChatById({ id });
 
         const userMessage = getMostRecentUserMessage(messages);
 
-        console.info('userMessage:', JSON.stringify(userMessage, null, 2));
         if (!userMessage) {
             return new Response('No user message found', { status: 400 });
         }
@@ -57,20 +53,19 @@ export async function POST(request: Request) {
             await saveChat({ id, title, userId: session.user.id, });
         }
 
-        // 保存 messages
-        // await saveMessages({
-        //     messages: [
-        //       {
-        //         chatId: id,
-        //         id: userMessage.id,
-        //         role: 'user',
-        //         parts: userMessage.parts,
-        //         attachments: userMessage.experimental_attachments ?? [],
-        //         createdAt: new Date(),
-        //       },
-        //     ],
-        //   });
-
+        // 保存 user 发出的  messages
+        await saveMessages({
+            messages: [
+              {
+                id: userMessage.id,
+                chatId: id,
+                role: 'user',
+                parts: userMessage.parts,
+                attachments: userMessage.experimental_attachments ?? [],
+                createdAt: new Date(),
+              },
+            ],
+          });
 
 
         // 调用 AI 模型进行对话
@@ -133,40 +128,41 @@ export async function POST(request: Request) {
                         console.info('step  is -----', JSON.stringify(step, null, 2))
                     },
                     onFinish: async ({ response }) => {
-                        //   if (session.user?.id) {
-                        //     try {
-                        //       const assistantId = getTrailingMessageId({
-                        //         messages: response.messages.filter(
-                        //           (message) => message.role === 'assistant',
-                        //         ),
-                        //       });
+                          if (session.user?.id) {
+                            try {
+                              const assistantId = getTrailingMessageId({
+                                messages: response.messages.filter(
+                                  (message) => message.role === 'assistant',
+                                ),
+                              });
 
-                        //       if (!assistantId) {
-                        //         throw new Error('No assistant message found!');
-                        //       }
+                              if (!assistantId) {
+                                throw new Error('No assistant message found!');
+                              }
 
-                        //       const [, assistantMessage] = appendResponseMessages({
-                        //         messages: [userMessage],
-                        //         responseMessages: response.messages,
-                        //       });
+                              const [, assistantMessage] = appendResponseMessages({
+                                messages: [userMessage],
+                                responseMessages: response.messages,
+                              });
 
-                        //       await saveMessages({
-                        //         messages: [
-                        //           {
-                        //             id: assistantId,
-                        //             chatId: id,
-                        //             role: assistantMessage.role,
-                        //             parts: assistantMessage.parts,
-                        //             attachments:
-                        //               assistantMessage.experimental_attachments ?? [],
-                        //             createdAt: new Date(),
-                        //           },
-                        //         ],
-                        //       });
-                        //     } catch (_) {
-                        //       console.error('Failed to save chat');
-                        //     }
-                        //   }
+                            //  这里保留的是机器返回的信息
+                              await saveMessages({
+                                messages: [
+                                  {
+                                    id: assistantId,
+                                    chatId: id,
+                                    role: assistantMessage.role,
+                                    parts: assistantMessage.parts,
+                                    attachments:
+                                      assistantMessage.experimental_attachments ?? [],
+                                    createdAt: new Date(),
+                                  },
+                                ],
+                              });
+                            } catch (e) {
+                              console.error('Failed to save chat', e);
+                            }
+                          }
                         console.info('response is', response);
                     },
                     onError: (e) => {
@@ -223,6 +219,7 @@ export async function DELETE(request: Request) {
 
         return new Response('Chat deleted', { status: 200 });
     } catch (error) {
+        console.info('error', error)
         return new Response('An error occurred while processing your request!', {
             status: 500,
         });

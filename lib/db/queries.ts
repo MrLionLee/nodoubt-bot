@@ -1,6 +1,6 @@
 
 
-import { and, asc, desc, eq, gt, gte, inArray, lt, SQL } from 'drizzle-orm';
+import { and, asc, desc, eq, gt, lt, SQL } from 'drizzle-orm';
 import { genSaltSync, hashSync } from 'bcrypt-ts';
 
 import { drizzle } from 'drizzle-orm/postgres-js';
@@ -106,7 +106,7 @@ export async function getChatsByUserId({
     try {
         const extendedLimit = limit + 1;
 
-        const query = (whereCondition?: SQL<any>) =>
+        const query = (whereCondition?: SQL) =>
             db
                 .select()
                 .from(chat)

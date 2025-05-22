@@ -12,7 +12,6 @@ export const authConfig = {
   callbacks: {
     // 中间件执行时才会调用这个函数，用于判断是否需要重定向到登录页面
     authorized({ auth, request: { nextUrl } }) {
-      console.info('authorized', auth, nextUrl);
       const isLoggedIn = !!auth?.user;
       const isOnChat = nextUrl.pathname.startsWith('/');
       const isOnRegister = nextUrl.pathname.startsWith('/register');

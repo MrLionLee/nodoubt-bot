@@ -45,7 +45,7 @@ export interface ChatHistory {
   hasMore: boolean;
 }
 
-const PAGE_SIZE = 20;
+// const PAGE_SIZE = 20;
 
 const groupChatsByDate = (chats: Chat[]): GroupedChats => {
   const now = new Date();
@@ -112,7 +112,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
     data: paginatedChatHistories,
     setSize,
     isValidating,
-    isLoading,
+    // isLoading,
     mutate,
   } = useSWRInfinite<ChatHistory>(getChatHistoryPaginationKey, fetcher, {
     fallbackData: [],

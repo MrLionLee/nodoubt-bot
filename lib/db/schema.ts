@@ -6,9 +6,6 @@ import {
   json,
   uuid,
   text,
-  primaryKey,
-  foreignKey,
-  boolean,
 } from 'drizzle-orm/pg-core';
 
 

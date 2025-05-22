@@ -15,13 +15,13 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
   const { id } = params;
   const chat = await getChatById({ id });
-
+  console.trace('chat is ', chat)
   if (!chat) {
     notFound();
   }
 
   const session = await auth();
-
+  console.trace('session is ', session)
   if (chat.visibility === 'private') {
     if (!session || !session.user) {
       return notFound();
@@ -36,7 +36,6 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
     id,
   });
 
-  console.info('messagesFromDb', messagesFromDb);
 
   function convertToUIMessages(messages: Array<DBMessage>): Array<UIMessage> {
     return messages.map((message) => ({
@@ -53,6 +52,8 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
 
   const cookieStore = await cookies();
   const chatModelFromCookie = cookieStore.get('chat-model');
+  
+  console.trace('cookieStore is ', cookieStore, chatModelFromCookie)
 
   if (!chatModelFromCookie) {
     return (
