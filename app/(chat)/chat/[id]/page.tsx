@@ -2,9 +2,10 @@
 import { notFound } from 'next/navigation';
 import { cookies } from 'next/headers';
 
-import { Chat } from '@/components/chat';
-import { getChatById,getMessagesByChatId } from '@/lib/db/queries';
+import { Chat } from '@/components/chat/chat';
+import { DataStreamHandler } from '@/components/chat/data-stream-handler';
 
+import { getChatById,getMessagesByChatId } from '@/lib/db/queries';
 import { DEFAULT_CHAT_MODEL } from '@/lib/ai/models';
 import { DBMessage } from '@/lib/db/schema';
 import { Attachment, UIMessage } from 'ai';
@@ -15,19 +16,20 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
   const { id } = params;
   const chat = await getChatById({ id });
-  console.trace('chat is ', chat)
   if (!chat) {
+    console.error('chat not found');
     notFound();
   }
 
   const session = await auth();
-  console.trace('session is ', session)
   if (chat.visibility === 'private') {
     if (!session || !session.user) {
+    console.error('session.user not found');
       return notFound();
     }
 
     if (session.user.id !== chat.userId) {
+      console.error('session.user is not equeal to chat.userId');
       return notFound();
     }
   }
@@ -53,7 +55,6 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
   const cookieStore = await cookies();
   const chatModelFromCookie = cookieStore.get('chat-model');
   
-  console.trace('cookieStore is ', cookieStore, chatModelFromCookie)
 
   if (!chatModelFromCookie) {
     return (
@@ -65,7 +66,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
           // selectedVisibilityType={chat.visibility}
           isReadonly={session?.user?.id !== chat.userId}
         />
-        {/* <DataStreamHandler id={id} /> */}
+        <DataStreamHandler id={id} />
       </>
     );
   }
@@ -80,7 +81,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
         // selectedVisibilityType={chat.visibility}
         isReadonly={session?.user?.id !== chat.userId}
       />
-      {/* <DataStreamHandler id={id} /> */}
+      <DataStreamHandler id={id} />
     </>
   );
 }

@@ -77,7 +77,7 @@ export async function POST(request: Request) {
                     system: systemPrompt({ selectedChatModel }),
                     messages,
                     maxSteps: 5,
-                    experimental_activeTools: [],
+                    // experimental_activeTools: 
                     // selectedChatModel === 'chat-model-reasoning'
                     //     ? []
                     //     : [
@@ -90,33 +90,33 @@ export async function POST(request: Request) {
                     experimental_generateMessageId: generateUUID,
                     // 这里的 tools 需要和对应的 modal 匹配
                     tools: {
-                        getWeather: {
-                            description: "Get current weather",
-                            parameters: {
-                                type: "object",
-                                properties: {
-                                    location: {
-                                        type: "string",
-                                        description: "City name"
-                                    }
-                                },
-                                required: ["location"]
-                            },
-                            execute: async (args: { location: string }) => {
-                                console.log('Weather args:', args);
-                                try {
-                                    // return await getWeather(args.location);
-                                    return {
-                                        location,
-                                        temperature: 25,
-                                        unit: '°C'
-                                    }
-                                } catch (error) {
-                                    console.error('Weather error:', error);
-                                    return { error: 'Weather service unavailable' };
-                                }
-                            }
-                        },
+                        // getWeather: {
+                        //     description: "Get current weather",
+                        //     parameters: {
+                        //         type: "object",
+                        //         properties: {
+                        //             location: {
+                        //                 type: "string",
+                        //                 description: "City name"
+                        //             }
+                        //         },
+                        //         required: ["location"]
+                        //     },
+                        //     execute: async (args: { location: string }) => {
+                        //         console.log('Weather args:', args);
+                        //         try {
+                        //             // return await getWeather(args.location);
+                        //             return {
+                        //                 location,
+                        //                 temperature: 25,
+                        //                 unit: '°C'
+                        //             }
+                        //         } catch (error) {
+                        //             console.error('Weather error:', error);
+                        //             return { error: 'Weather service unavailable' };
+                        //         }
+                        //     }
+                        // },
                         // createDocument: createDocument({ dataStream }),
                         // updateDocument: updateDocument({ session, dataStream }),
                         // requestSuggestions: requestSuggestions({
@@ -163,10 +163,6 @@ export async function POST(request: Request) {
                               console.error('Failed to save chat', e);
                             }
                           }
-                        console.info('response is', response);
-                    },
-                    onError: (e) => {
-                        console.info('error is', e)
                     },
                     experimental_telemetry: {
                         isEnabled: isProductionEnvironment, //  todo
@@ -174,14 +170,14 @@ export async function POST(request: Request) {
                     },
                 }); // AI 流文本生成
 
-                console.info('result', result)
                 result.consumeStream();
 
                 result.mergeIntoDataStream(dataStream, {
                     sendReasoning: true,
                 }); // 合并数据流
             },
-            onError: () => {
+            onError: (e) => {
+                console.error('Error streaming response:', e);
                 return 'Oops, an error occurred!';
             },
         });
@@ -219,7 +215,7 @@ export async function DELETE(request: Request) {
 
         return new Response('Chat deleted', { status: 200 });
     } catch (error) {
-        console.info('error', error)
+        console.error('error', error)
         return new Response('An error occurred while processing your request!', {
             status: 500,
         });

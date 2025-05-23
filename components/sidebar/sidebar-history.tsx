@@ -45,7 +45,7 @@ export interface ChatHistory {
   hasMore: boolean;
 }
 
-// const PAGE_SIZE = 20;
+const PAGE_SIZE = 20;
 
 const groupChatsByDate = (chats: Chat[]): GroupedChats => {
   const now = new Date();
@@ -85,7 +85,6 @@ export function getChatHistoryPaginationKey(
   pageIndex: number,
   previousPageData: ChatHistory,
 ) {
-  const PAGE_SIZE = 10;
   if (previousPageData && previousPageData.hasMore === false) {
     return null;
   }
@@ -141,7 +140,6 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
         success: () => {
           // delete 方法执行成功后，调用 mutate 方法更新缓存数据
           mutate((chatHistories) => {
-            console.info('chatHistories', chatHistories,deleteId);
             if (chatHistories) {
               return chatHistories.map((chatHistory) => ({
                 ...chatHistory,

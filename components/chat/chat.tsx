@@ -5,7 +5,11 @@ import { useChat } from '@ai-sdk/react'
 import { generateUUID } from '@/lib/utils';
 import type { UIMessage, Attachment } from 'ai'
 import { useState } from 'react';
-import { Messages } from './messages';
+import { Messages } from '@/components/chat/messages';
+import useSWR, { useSWRConfig } from 'swr';
+import { unstable_serialize } from 'swr/infinite';
+import { getChatHistoryPaginationKey } from '@/components/sidebar/sidebar-history';
+import { toast } from 'sonner';
 
 
 export function Chat({ id,
@@ -19,9 +23,11 @@ export function Chat({ id,
   }) {
 
   const [attachments, setAttachments] = useState<Array<Attachment>>([]);
+  const { mutate } = useSWRConfig();
 
 
   const {
+    data,
     messages,
     setMessages,
     handleSubmit,
@@ -40,14 +46,14 @@ export function Chat({ id,
     sendExtraMessageFields: true,
     generateId: generateUUID,
     onFinish: () => {
-      console.info('onFinish')
-      // mutate(unstable_serialize(getChatHistoryPaginationKey)); // 正在
+      mutate(unstable_serialize(getChatHistoryPaginationKey)); // 正在
     },
-    onError: (e) => {
-      console.error('error', e)
-      // toast.error('An error occurred, please try again!');
+    onError: () => {
+      toast.error('An error occurred, please try again!');
     },
   });
+
+  console.info('data', data);
 
 
   return (

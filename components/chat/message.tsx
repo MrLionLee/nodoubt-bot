@@ -3,7 +3,7 @@ import type { UIMessage } from 'ai';
 import type { UseChatHelpers } from '@ai-sdk/react';
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { PencilEditIcon, SparklesIcon } from './icons';
+import { PencilEditIcon, SparklesIcon } from '../icons';
 import ReactMarkdown from 'react-markdown';
 
 import { Button, Tooltip } from 'antd';
@@ -74,7 +74,6 @@ export  const Message = ({
   
               {message.parts?.map((part, index) => {
                 const { type } = part;
-                console.info('type is',type);
                 const key = `message-${message.id}-part-${index}`;
   
                 // if (type === 'reasoning') {

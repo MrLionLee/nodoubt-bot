@@ -1,7 +1,7 @@
 import type { UIMessage } from 'ai';
 import type { UseChatHelpers } from '@ai-sdk/react';
-import { Message } from './message';
-import { Greeting } from './greeting';
+import { Message } from '@/components/chat/message';
+import { Greeting } from '@/components/greeting';
 
 
 interface MessagesProps {

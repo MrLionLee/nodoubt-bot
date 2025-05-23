@@ -13,9 +13,7 @@ export default async function Layout({
 }: {
     children: React.ReactNode;
 }) {
-      const [session, cookieStore] = await Promise.all([auth(), cookies()]);
-      console.info('session', session);
-      console.info('cookieStore', cookieStore);
+    const [session, cookieStore] = await Promise.all([auth(), cookies()]);
     return (
         <>
             <Script

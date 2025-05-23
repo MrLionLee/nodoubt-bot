@@ -34,7 +34,6 @@ export default function Page() {
         description: 'Failed validating your submission!',
       });
     } else if (state.status === 'success') {
-      console.info('Account created successfully!');
       toast({ type: 'success', description: 'Account created successfully!' });
       
       setIsSuccessful(true);
