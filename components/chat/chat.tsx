@@ -10,6 +10,7 @@ import useSWR, { useSWRConfig } from 'swr';
 import { unstable_serialize } from 'swr/infinite';
 import { getChatHistoryPaginationKey } from '@/components/sidebar/sidebar-history';
 import { toast } from 'sonner';
+import { ChatHeader } from '@/components/chat/chat-header';
 
 
 export function Chat({ id,
@@ -58,6 +59,10 @@ export function Chat({ id,
 
   return (
     <div className="flex flex-col min-w-0 h-dvh bg-background">
+        <ChatHeader
+          selectedModelId={selectedChatModel}
+          isReadonly={isReadonly}
+        />
       <Messages
         chatId={id}
         status={status}

@@ -1,5 +1,8 @@
+'use server';
+
 import { generateText, Message } from 'ai';
 import { myProvider } from '@/lib/ai/providers';
+import { cookies } from 'next/headers';
 
 
 // 调用 ai 生成 menu 的 title
@@ -19,4 +22,9 @@ export async function generateTitleFromUserMessage({
     });
   
     return title;
+  }
+
+  export async function saveChatModelAsCookie(model: string) {
+    const cookieStore = await cookies();
+    cookieStore.set('chat-model', model);
   }

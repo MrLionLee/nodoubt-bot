@@ -1,7 +1,12 @@
 import type { UIMessage } from 'ai';
 import type { UseChatHelpers } from '@ai-sdk/react';
-import { Message } from '@/components/chat/message';
+import { PurePreviewMessage , ThinkingMessage} from '@/components/chat/message';
 import { Greeting } from '@/components/greeting';
+import equal from 'fast-deep-equal';
+import { useScrollToBottom } from '@/components/use-scroll-to-bottom';
+
+
+import { memo } from 'react';
 
 
 interface MessagesProps {
@@ -15,7 +20,7 @@ interface MessagesProps {
     // isArtifactVisible: boolean;
 }
 
-export function Messages({
+export function PureMessages({
     chatId,
     status,
     // votes,
@@ -24,8 +29,12 @@ export function Messages({
     reload,
     isReadonly,
 }: MessagesProps) {
+
+    const [messagesContainerRef, messagesEndRef] =
+        useScrollToBottom<HTMLDivElement>();
     return (
         <div
+            ref={messagesContainerRef}
             className="flex flex-col min-w-0 gap-6 flex-1 overflow-y-scroll pt-4"
         >
 
@@ -34,7 +43,7 @@ export function Messages({
 
             {
                 messages.map((message, index) => (
-                    <Message
+                    <PurePreviewMessage
                         key={message.id}
                         chatId={chatId}
                         message={message}
@@ -51,6 +60,25 @@ export function Messages({
                     />
                 ))
             }
+
+            {/* 真正数据没处理的时候，展示给用户看的 loading */}
+            {status === 'submitted' &&
+                messages.length > 0 &&
+                messages[messages.length - 1].role === 'user' && <ThinkingMessage />}
+
+            <div
+                ref={messagesEndRef}
+                className="shrink-0 min-w-[24px] min-h-[24px]"
+            />
         </div>
     )
 }
+
+
+export const Messages = memo(PureMessages, (prevProps, nextProps) => {
+    if (prevProps.status !== nextProps.status) return false;
+    if (prevProps.status && nextProps.status) return false;
+    if (prevProps.messages.length !== nextProps.messages.length) return false;
+    if (!equal(prevProps.messages, nextProps.messages)) return false;
+    return true;
+});

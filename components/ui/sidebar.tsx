@@ -1,8 +1,9 @@
 
 "use client"
-import { forwardRef, createContext, useContext, useMemo, useState, useCallback } from 'react'
+import { forwardRef, createContext, useContext, useMemo, useState, useCallback, useEffect } from 'react'
 import { cn } from '@/lib/utils';
 import { Slot } from '@radix-ui/react-slot';
+import { PanelLeft } from 'lucide-react';
 import {
     Tooltip,
     TooltipContent,
@@ -10,12 +11,13 @@ import {
     TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { VariantProps, cva } from 'class-variance-authority';
+import { Button } from '@/components/ui/button';
 const SIDEBAR_COOKIE_NAME = 'sidebar:state';
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 const SIDEBAR_WIDTH = '16rem';
 // const SIDEBAR_WIDTH_MOBILE = '18rem';
 const SIDEBAR_WIDTH_ICON = '3rem';
-// const SIDEBAR_KEYBOARD_SHORTCUT = 'b';
+const SIDEBAR_KEYBOARD_SHORTCUT = 'b';
 
 type SidebarContext = {
     state: 'expanded' | 'collapsed';
@@ -72,6 +74,23 @@ const SidebarProvider = forwardRef<HTMLDivElement, React.ComponentProps<'div'> &
     const toggleSidebar = useCallback(() => {
         return setOpen((open) => !open)
     }, [setOpen]);
+
+    // Adds a keyboard shortcut to toggle the sidebar.
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (
+                event.key === SIDEBAR_KEYBOARD_SHORTCUT &&
+                (event.metaKey || event.ctrlKey)
+            ) {
+                event.preventDefault();
+                toggleSidebar();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [toggleSidebar]);
+
 
     const contextValue = useMemo<SidebarContext>(
         () => ({
@@ -437,6 +456,34 @@ const SidebarMenuItem = forwardRef<
 ));
 SidebarMenuItem.displayName = 'SidebarMenuItem';
 
+
+const SidebarTrigger = forwardRef<
+    React.ElementRef<typeof Button>,
+    React.ComponentProps<typeof Button>
+>(({ className, onClick, ...props }, ref) => {
+    const { toggleSidebar } = useSidebar();
+    return (
+        <Button
+            ref={ref}
+            data-sidebar="trigger"
+            variant="ghost"
+            size="icon"
+            className={cn('h-7 w-7', className)}
+            onClick={(event) => {
+                onClick?.(event);
+                toggleSidebar();
+            }}
+            {...props}
+        >
+            <PanelLeft />
+            <span className="sr-only">Toggle Sidebar</span>
+        </Button>
+    );
+});
+SidebarTrigger.displayName = 'SidebarTrigger';
+
+
+
 export {
     SidebarProvider,
     SidebarInset,
@@ -450,5 +497,6 @@ export {
     SidebarGroupContent,
     SidebarMenuAction,
     SidebarMenuButton,
-    SidebarMenuItem
+    SidebarMenuItem,
+    SidebarTrigger
 }

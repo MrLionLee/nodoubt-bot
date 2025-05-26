@@ -14,7 +14,7 @@ import { systemPrompt } from '@/lib/ai/prompts';
 import { myProvider } from '@/lib/ai/providers';
 import { isProductionEnvironment } from '@/lib/constants'
 import { getChatById, saveChat, saveMessages, deleteChatById } from '@/lib/db/queries'
-import { generateTitleFromUserMessage } from './actions'
+import { generateTitleFromUserMessage } from '../../actions'
 import { auth } from '@/app/(auth)/auth';
 
 
@@ -66,7 +66,6 @@ export async function POST(request: Request) {
               },
             ],
           });
-
 
         // 调用 AI 模型进行对话
         return createDataStreamResponse({

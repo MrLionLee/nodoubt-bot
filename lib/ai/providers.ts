@@ -24,7 +24,7 @@ const kimiAI = createOpenAICompatible({
 export const myProvider = customProvider({
     languageModels: {
         'chat-model':kimiAI,
-        // 后面这个用 deepseek 模型
+        'chat-model-reasoning': kimiAI,
         'title-model': deepseek,
     },
     imageModels: {
