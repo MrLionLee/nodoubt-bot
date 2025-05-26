@@ -1,6 +1,6 @@
 "use client"
 
-import { MultimodelInput } from '@/components/multimodal-input'
+import { MultimodelInput } from '@/components/chat/multimodal-input'
 import { useChat } from '@ai-sdk/react'
 import { generateUUID } from '@/lib/utils';
 import type { UIMessage, Attachment } from 'ai'

@@ -52,3 +52,5 @@ export const systemPrompt = ({
         return `${regularPrompt}\n\n${artifactsPrompt}`;
     }
 };
+
+
