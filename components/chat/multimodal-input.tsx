@@ -2,7 +2,6 @@
 import type { UseChatHelpers } from '@ai-sdk/react';
 import cx from 'classnames';
 import type { Attachment, UIMessage } from 'ai';
-import { useLocalStorageState, useSize } from 'ahooks';
 import { useLocalStorage, useWindowSize } from 'usehooks-ts';
 import {
   memo,
@@ -22,11 +21,13 @@ import {
   useEffect
 } from 'react';
 import { toast } from 'sonner';
+import equal from 'fast-deep-equal';
+
 
 
 
 // 输入控制区
-export function MultimodelInput({
+export function PureMultimodalInput({
   chatId,
   input,
   setInput,
@@ -120,6 +121,10 @@ export function MultimodelInput({
     setAttachments([]);
     setLocalStorageInput('');
     resetHeight();
+
+    if (width && width > 768) {
+      textareaRef.current?.focus();
+    }
   }, [
     attachments,
     handleSubmit,
@@ -152,6 +157,7 @@ export function MultimodelInput({
       const { error } = await response.json();
       toast.error(error);
     } catch (error) {
+      console.error(error);
       toast.error('Failed to upload file, please try again!');
     }
   };
@@ -265,6 +271,16 @@ export function MultimodelInput({
   );
 }
 
+export const MultimodalInput = memo(
+  PureMultimodalInput,
+  (prevProps, nextProps) => {
+    if (prevProps.input !== nextProps.input) return false;
+    if (prevProps.status !== nextProps.status) return false;
+    if (!equal(prevProps.attachments, nextProps.attachments)) return false;
+
+    return true;
+  },
+);
 
 const AttachmentsButton = memo(PureAttachmentsButton)
 

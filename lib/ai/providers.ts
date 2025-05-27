@@ -1,6 +1,6 @@
 import { createDeepSeek } from '@ai-sdk/deepseek'
 // import {open} from '@ai-sdk/deepseek'
-import { customProvider, extractReasoningMiddleware, wrapLanguageModel } from 'ai'
+import { customProvider} from 'ai'
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
 
 

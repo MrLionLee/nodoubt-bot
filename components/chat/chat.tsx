@@ -1,12 +1,12 @@
 "use client"
 
-import { MultimodelInput } from '@/components/chat/multimodal-input'
+import { MultimodalInput } from '@/components/chat/multimodal-input'
 import { useChat } from '@ai-sdk/react'
 import { generateUUID } from '@/lib/utils';
 import type { UIMessage, Attachment } from 'ai'
 import { useState } from 'react';
 import { Messages } from '@/components/chat/messages';
-import useSWR, { useSWRConfig } from 'swr';
+import  { useSWRConfig } from 'swr';
 import { unstable_serialize } from 'swr/infinite';
 import { getChatHistoryPaginationKey } from '@/components/sidebar/sidebar-history';
 import { toast } from 'sonner';
@@ -28,7 +28,6 @@ export function Chat({ id,
 
 
   const {
-    data,
     messages,
     setMessages,
     handleSubmit,
@@ -53,9 +52,6 @@ export function Chat({ id,
       toast.error('An error occurred, please try again!');
     },
   });
-  console.info('messages', messages);
-
-
   return (
     <div className="flex flex-col min-w-0 h-dvh bg-background">
         <ChatHeader
@@ -74,7 +70,7 @@ export function Chat({ id,
       />
 
       <form className="flex mx-auto px-4 bg-background pb-4 md:pb-6 gap-2 w-full md:max-w-3xl">
-        <MultimodelInput
+        <MultimodalInput
           chatId={id}
           input={input}
           setInput={setInput}
