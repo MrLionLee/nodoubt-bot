@@ -53,8 +53,7 @@ export function Chat({ id,
       toast.error('An error occurred, please try again!');
     },
   });
-
-  console.info('data', data);
+  console.info('messages', messages);
 
 
   return (

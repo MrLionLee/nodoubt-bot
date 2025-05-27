@@ -9,12 +9,14 @@ import ReactMarkdown from 'react-markdown';
 import { Button, Tooltip } from 'antd';
 import { cn } from '@/lib/utils';
 import equal from 'fast-deep-equal';
+import { PreviewAttachment } from './preview-attachment';
+import { MessageReasoning } from './message-reasoning';
 
 export const PurePreviewMessage = ({
   // chatId,
   message,
   // vote,
-  // isLoading,
+  isLoading,
   // setMessages,
   // reload,
   isReadonly,
@@ -59,7 +61,7 @@ export const PurePreviewMessage = ({
 
           {/* 右侧内容区 */}
           <div className="flex flex-col gap-4 w-full">
-            {/* {message.experimental_attachments && (
+            {message.experimental_attachments && (
                 <div
                   data-testid={`message-attachments`}
                   className="flex flex-row justify-end gap-2"
@@ -71,21 +73,21 @@ export const PurePreviewMessage = ({
                     />
                   ))}
                 </div>
-              )} */}
+              )}
 
             {message.parts?.map((part, index) => {
               const { type } = part;
               const key = `message-${message.id}-part-${index}`;
 
-              // if (type === 'reasoning') {
-              //   return (
-              //     <MessageReasoning
-              //       key={key}
-              //       isLoading={isLoading}
-              //       reasoning={part.reasoning}
-              //     />
-              //   );
-              // }
+              if (type === 'reasoning') {
+                return (
+                  <MessageReasoning
+                    key={key}
+                    isLoading={isLoading}
+                    reasoning={part.reasoning}
+                  />
+                );
+              }
 
               if (type === 'text') {
                 if (mode === 'view') {
