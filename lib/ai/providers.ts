@@ -1,12 +1,18 @@
 import { createDeepSeek } from '@ai-sdk/deepseek'
 // import {open} from '@ai-sdk/deepseek'
-import { customProvider} from 'ai'
+import { customProvider } from 'ai'
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
-
+import { isTestEnvironment } from '../constants';
+import {
+    artifactModel,
+    chatModel,
+    reasoningModel,
+    titleModel,
+} from './models.test';
 
 const deepseek = createDeepSeek({
     baseURL: 'https://api.chataiapi.com/v1',
-    apiKey: process.env.DEEPSEEK_API_KEY ,
+    apiKey: process.env.DEEPSEEK_API_KEY,
 })
 
 //   const openAI = createOpenAI({
@@ -16,27 +22,38 @@ const deepseek = createDeepSeek({
 // })('gpt-3.5-turbo')
 
 const kimiAI = createOpenAICompatible({
-    name:'moonshot',
+    name: 'moonshot',
     baseURL: "https://api.moonshot.cn/v1",
     apiKey: process.env.OPENAI_KIMI_API_KEY
 })('moonshot-v1-8k')
 
-export const myProvider = customProvider({
+
+const testingProvider = customProvider({
     languageModels: {
-        'chat-model':kimiAI,
-        'chat-model-reasoning': deepseek('deepseek-reasoner'),
-        // 'chat-model-reasoning': wrapLanguageModel({
-        //     model:deepseek('deepseek-reasoner'),
-        //     middleware: extractReasoningMiddleware({
-        //         tagName:'think'
-        //     })
-        // }),
-        'title-model': deepseek('deepseek-chat'),
-    },
-    imageModels: {
-        // 'small-model': createOpenAI({
-        //     baseURL: "https://xiaoai.plus/v1",
-        //     apiKey: process.env.OPENAI_API_KEY
-        // }),
-    },
+        'chat-model': chatModel,
+        'chat-model-reasoning': reasoningModel,
+        'title-model': titleModel,
+        'artifact-model': artifactModel,
+    }
 })
+
+export const myProvider = true ? testingProvider :
+    customProvider({
+        languageModels: {
+            'chat-model': kimiAI,
+            'chat-model-reasoning': deepseek('deepseek-reasoner'),
+            // 'chat-model-reasoning': wrapLanguageModel({
+            //     model:deepseek('deepseek-reasoner'),
+            //     middleware: extractReasoningMiddleware({
+            //         tagName:'think'
+            //     })
+            // }),
+            'title-model': deepseek('deepseek-chat'),
+        },
+        imageModels: {
+            // 'small-model': createOpenAI({
+            //     baseURL: "https://xiaoai.plus/v1",
+            //     apiKey: process.env.OPENAI_API_KEY
+            // }),
+        },
+    })
