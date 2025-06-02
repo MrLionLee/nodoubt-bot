@@ -1,6 +1,6 @@
 import type { UIMessage } from 'ai';
 import type { UseChatHelpers } from '@ai-sdk/react';
-import { PurePreviewMessage , ThinkingMessage} from '@/components/chat/message';
+import { PreviewMessage , ThinkingMessage} from '@/components/chat/message';
 import { Greeting } from '@/components/greeting';
 import equal from 'fast-deep-equal';
 import { useScrollToBottom } from '@/components/use-scroll-to-bottom';
@@ -43,20 +43,10 @@ export function PureMessages({
 
             {
                 messages.map((message, index) => (
-                    <PurePreviewMessage
+                    <PreviewMessage
                         key={message.id}
-                        chatId={chatId}
                         message={message}
                         isLoading={status === 'streaming' && messages.length - 1 === index}
-                        // vote={
-                        //     votes
-                        //         ? votes.find((vote) => vote.messageId === message.id)
-                        //         : undefined
-                        // }
-
-                        setMessages={setMessages}
-                        reload={reload}
-                        isReadonly={isReadonly}
                     />
                 ))
             }

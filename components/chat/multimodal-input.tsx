@@ -32,7 +32,7 @@ export function PureMultimodalInput({
   input,
   setInput,
   status,
-  // stop,
+  stop,
   attachments,
   setAttachments,
   // messages,

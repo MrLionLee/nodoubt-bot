@@ -37,7 +37,7 @@ const testingProvider = customProvider({
     }
 })
 
-export const myProvider = true ? testingProvider :
+export const myProvider = isTestEnvironment ? testingProvider :
     customProvider({
         languageModels: {
             'chat-model': kimiAI,
@@ -49,6 +49,7 @@ export const myProvider = true ? testingProvider :
             //     })
             // }),
             'title-model': deepseek('deepseek-chat'),
+            "artifact-model": deepseek('deepseek-chat')
         },
         imageModels: {
             // 'small-model': createOpenAI({

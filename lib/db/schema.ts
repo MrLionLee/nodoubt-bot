@@ -6,6 +6,7 @@ import {
   json,
   uuid,
   text,
+  primaryKey,
 } from 'drizzle-orm/pg-core';
 
 
@@ -47,3 +48,27 @@ export const message = pgTable('Message_v2', {
 });
 
 export type DBMessage = InferSelectModel<typeof message>;
+
+
+export const document = pgTable(
+'Document',
+  {
+    id: uuid('id').notNull().defaultRandom(),
+    createdAt: timestamp('createdAt').notNull(),
+    title: text('title').notNull(),
+    content: text('content'),
+    kind: varchar('text', { enum: ['text', 'code', 'image', 'sheet'] })
+      .notNull()
+      .default('text'),
+    userId: uuid('userId')
+      .notNull()
+      .references(() => user.id),
+  },
+  (table) => {
+    return {
+      pk: primaryKey({ columns: [table.id, table.createdAt] }),
+    };
+  },
+);
+
+export type Document = InferSelectModel<typeof document>;

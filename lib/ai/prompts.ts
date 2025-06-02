@@ -3,6 +3,8 @@
  *  prompts 是一个非常重要的概念，它决定了 AI 模型的行为和输出。
  *  后续需要系统学习并积累 prompts，帮助 ai 拿到更优秀的回答，目前都只是复用别人开源的
  */
+import { ArtifactKind } from '@/components/artifact/artifact';
+
 
 // 常规的 prompts
 export const regularPrompt =
@@ -54,3 +56,28 @@ export const systemPrompt = ({
 };
 
 
+
+
+export const updateDocumentPrompt = (
+    currentContent: string | null,
+    type: ArtifactKind,
+  ) =>
+    type === 'text'
+      ? `\
+  Improve the following contents of the document based on the given prompt.
+  
+  ${currentContent}
+  `
+      : type === 'code'
+        ? `\
+  Improve the following code snippet based on the given prompt.
+  
+  ${currentContent}
+  `
+        : type === 'sheet'
+          ? `\
+  Improve the following spreadsheet based on the given prompt.
+  
+  ${currentContent}
+  `
+          : '';

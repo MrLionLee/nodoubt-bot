@@ -5,6 +5,8 @@ import { genSaltSync, hashSync } from 'bcrypt-ts';
 
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
+import { ArtifactKind } from '@/components/artifact/artifact';
+
 
 import {
     chat,
@@ -13,6 +15,7 @@ import {
     message,
     user,
     type User,
+    document
 } from './schema';
 
 // biome-ignore lint: Forbidden non-null assertion.
@@ -189,3 +192,47 @@ export async function getMessagesByChatId({ id }: { id: string }) {
         throw error;
     }
 }
+
+// --- document
+export async function saveDocument({
+    id,
+    title,
+    kind,
+    content,
+    userId,
+  }: {
+    id: string;
+    title: string;
+    kind: ArtifactKind;
+    content: string;
+    userId: string;
+  }) {
+    try {
+        return await db.insert(document).values({
+            id,
+            title,
+            kind,
+            content,
+            userId,
+            createdAt: new Date(),
+          });
+    } catch (error) {
+      console.error('Failed to save document in database');
+      throw error;
+    }
+  }
+
+export async function getDocumentsById({ id }: { id: string }) {
+    try {
+      const documents = await db
+        .select()
+        .from(document)
+        .where(eq(document.id, id))
+        .orderBy(asc(document.createdAt));
+  
+      return documents;
+    } catch (error) {
+      console.error('Failed to get document by id from database');
+      throw error;
+    }
+  }
