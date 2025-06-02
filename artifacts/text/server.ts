@@ -7,57 +7,61 @@ import { smoothStream, streamText } from "ai";
 
 export const textDocumentHandler = createDocumentHandler<'text'>({
     kind: 'text',
-    onCreateDocument: async ({title, dataStream}) => {
+    onCreateDocument: async ({ title, dataStream }) => {
         let draftContent = '';
 
-        const {fullStream}  = streamText({
-            model:myProvider.languageModel('artifact-model'),
-            system: 
+        const { fullStream } = streamText({
+            model: myProvider.languageModel('artifact-model'),
+            system:
                 'Write about the given topic. Markdown is supported. Use headings wherever appropriate.',
-            experimental_transform: smoothStream({chunking: 'word'}),
+            experimental_transform: smoothStream({ chunking: 'word' }),
             prompt: title,
         })
 
         for await (const delta of fullStream) {
-            const {type} = delta
-            if(type === 'text-delta'){
-                draftContent += delta.textDelta
+            const { type } = delta
+            if (type === 'text-delta') {
+                const { textDelta } = delta
 
+                draftContent += textDelta
+
+                // 分段处理
                 dataStream.writeData({
-                    kind: 'text',
-                    content: draftContent,
+                    type: 'text-delta',
+                    content: textDelta,
                 })
             }
         }
         return draftContent
 
     },
-    onUpdateDocument: async ({document, description, dataStream}) => {
+    onUpdateDocument: async ({ document, description, dataStream }) => {
         let draftContent = '';
 
-        const {fullStream} =  streamText({
-            model:myProvider.languageModel('artifact-model'),
+        const { fullStream } = streamText({
+            model: myProvider.languageModel('artifact-model'),
             system: updateDocumentPrompt(document.content, 'text'),
-            experimental_transform: smoothStream({chunking: 'word'}),
+            experimental_transform: smoothStream({ chunking: 'word' }),
             prompt: description,
             experimental_providerMetadata: {
                 openai: {
                     prediction: {
-                      type: 'content',
-                      content: document.content,
+                        type: 'content',
+                        content: document.content,
                     },
-                  },
+                },
             }
         })
 
         for await (const delta of fullStream) {
-            const {type} = delta
-            if(type === 'text-delta'){
-                draftContent += delta.textDelta
+            const { type } = delta
+            if (type === 'text-delta') {
+                const {textDelta} = delta
+                draftContent += textDelta
 
                 dataStream.writeData({
-                    kind: 'text',
-                    content: draftContent,
+                    type: 'text-delta',
+                    content: textDelta,
                 })
             }
         }

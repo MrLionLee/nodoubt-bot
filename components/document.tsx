@@ -1,7 +1,7 @@
 
 import type { ArtifactKind } from '@/components/artifact/artifact';
 import { useArtifact } from '@/hooks/use-artifact';
-import { FileIcon, PencilEditIcon, MessageIcon } from '@/components/icons';
+import { FileIcon, PencilEditIcon, MessageIcon ,LoaderIcon} from '@/components/icons';
 import {memo} from 'react';
 
 interface DocumentToolResultProps {
@@ -74,3 +74,59 @@ function PureDocumentToolResult({
 }
 
 export const DocumentToolResult = memo(PureDocumentToolResult, () => true);
+
+interface DocumentToolCallProps {
+    type: 'create' | 'update' | 'request-suggestions';
+    args: { title: string };
+  }
+
+function PureDocumentToolCall({
+    type,
+    args,
+  }: DocumentToolCallProps) {
+    const { setArtifact } = useArtifact();
+  
+    return (
+      <button
+        type="button"
+        className="cursor pointer w-fit border py-2 px-3 rounded-xl flex flex-row items-start justify-between gap-3"
+        onClick={(event) => {
+          const rect = event.currentTarget.getBoundingClientRect();
+  
+          const boundingBox = {
+            top: rect.top,
+            left: rect.left,
+            width: rect.width,
+            height: rect.height,
+          };
+  
+          setArtifact((currentArtifact) => ({
+            ...currentArtifact,
+            isVisible: true,
+            boundingBox,
+          }));
+        }}
+      >
+        <div className="flex flex-row gap-3 items-start">
+          <div className="text-zinc-500 mt-1">
+            {type === 'create' ? (
+              <FileIcon />
+            ) : type === 'update' ? (
+              <PencilEditIcon />
+            ) : type === 'request-suggestions' ? (
+              <MessageIcon />
+            ) : null}
+          </div>
+  
+          <div className="text-left">
+            {`${getActionText(type, 'present')} ${args.title ? `"${args.title}"` : ''}`}
+          </div>
+        </div>
+  
+        <div className="animate-spin mt-1">{<LoaderIcon />}</div>
+      </button>
+    );
+  }
+  
+  export const DocumentToolCall = memo(PureDocumentToolCall, () => true);
+  

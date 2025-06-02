@@ -11,13 +11,16 @@ import { Document } from '@/lib/db/schema'
 import equal from 'fast-deep-equal';
 import { RefObject, MouseEvent } from 'react'
 import { FullscreenIcon } from '@/components/icons'
-import {DocumentToolResult} from '@/components/chat/document'
+import {DocumentToolResult, DocumentToolCall} from '@/components/document'
 
+interface DocumentPreviewProps {
+    result?: any;
+    args?: any;
+  }
 export function DocumentPreview({
-    result
-}: {
-    result: any
-}) {
+    result,
+    args,
+}:DocumentPreviewProps) {
     const { artifact, setArtifact } = useArtifact();
     // 根据 result.id 获取对应的 document 列表，获取第一个 document 作为 previewDocument 的 value
     const { data: documents, isLoading: isDocumentsFetching } = useSWR<
@@ -52,12 +55,15 @@ export function DocumentPreview({
             )
         }
 
-        // 正在调用的时候，才会有 args 这个属性
-        // if(args) {
-        //     return (
-        //         <DocumentToolArgs></DocumentToolArgs>
-        //     )
-        // }
+        // 正在调用的时候，展示 loading 状态
+        if(args) {
+            return (
+                <DocumentToolCall
+                  type="create"
+                  args={{ title: args.title }}
+                />
+              );
+        }
     }
 
     const document: Document | null = previewDocument

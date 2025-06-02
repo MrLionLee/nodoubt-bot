@@ -1,3 +1,5 @@
+"use client"
+
 import type { UIMessage } from 'ai';
 import cx from 'classnames';
 import { memo } from 'react';
@@ -9,7 +11,7 @@ import { cn } from '@/lib/utils';
 import equal from 'fast-deep-equal';
 import { PreviewAttachment } from './preview-attachment';
 import { MessageReasoning } from './message-reasoning';
-import { DocumentPreview } from './document-preview'
+import { DocumentPreview } from '../document-preview'
 
 export const PurePreviewMessage = ({
   message,
@@ -18,7 +20,7 @@ export const PurePreviewMessage = ({
   message: UIMessage;
   isLoading: boolean;
 }) => {
-
+  console.info('message', message)
   return (
     <AnimatePresence>
       <motion.div
@@ -93,11 +95,17 @@ export const PurePreviewMessage = ({
               if (type === 'tool-invocation') {
                 const { toolInvocation } = part
                 const { toolName, toolCallId, state } = toolInvocation
-
+                console.info('toolName', toolName)
+                console.info('state', state)
                 if (state === 'call') {
-                  const { args } = toolInvocation
+                  const { args } = toolInvocation;
+
                   return (
-                    <div>call</div>
+                    <div
+                    key={toolCallId}
+                  >
+                    {toolName === 'createDocument' ? <DocumentPreview args={args} />: <div>待定</div>}
+                  </div>
                   )
                 }
 

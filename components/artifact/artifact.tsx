@@ -28,6 +28,7 @@ import { textArtifact } from '@/artifacts/text/client';
 import equal from 'fast-deep-equal';
 import { UseChatHelpers } from '@ai-sdk/react';
 
+// 定义好的 artifacts 类型
 export const artifactDefinitions = [
     textArtifact,
     // codeArtifact,
@@ -81,8 +82,6 @@ function PureArtifact({
     isReadonly: boolean;
 }) {
     const { artifact, setArtifact, metadata, setMetadata } = useArtifact();
-    console.info('artifact', artifact)
-    console.info('artifact.documentId', artifact.documentId)
     const {
         data: documents,
         isLoading: isDocumentsFetching,
@@ -93,6 +92,8 @@ function PureArtifact({
             : null,
         fetcher,
     );
+
+    console.error('artifact is',artifact)
 
     const [mode, setMode] = useState<'edit' | 'diff'>('edit');
     const [document, setDocument] = useState<Document | null>(null);
@@ -238,6 +239,7 @@ function PureArtifact({
         throw new Error('Artifact definition not found!');
     }
 
+    // 更新 suggestions
     // useEffect(() => {
     //     if (artifact.documentId !== 'init') {
     //         if (artifactDefinition.initialize) {
@@ -381,6 +383,7 @@ function PureArtifact({
                             },
                         }}
                     >
+                        {/* title */}
                         <div className="p-2 flex flex-row justify-between items-start">
                             <div className="flex flex-row gap-4 items-start">
                                 <ArtifactCloseButton />
@@ -408,6 +411,7 @@ function PureArtifact({
 
                             </div>
 
+                            {/* title 上的 actions 按钮 */}
                             {/* <ArtifactActions
                                 artifact={artifact}
                                 currentVersionIndex={currentVersionIndex}
@@ -422,21 +426,16 @@ function PureArtifact({
                         {/* 渲染的工作内容 */}
                         <div className="dark:bg-muted bg-background h-full overflow-y-scroll !max-w-full items-center">
                             <artifactDefinition.content
-                            // title={artifact.title}
-                            // content={
-                            //     isCurrentVersion
-                            //         ? artifact.content
-                            //         : getDocumentContentById(currentVersionIndex)
-                            // }
-                            // mode={mode}
-                            // status={artifact.status}
+                            title={artifact.title}
+                            content={artifact.content}
+                            status={artifact.status}
                             // currentVersionIndex={currentVersionIndex}
                             // suggestions={[]}
-                            // onSaveContent={saveContent}
+                            onSaveContent={saveContent}
                             // isInline={false}
                             // isCurrentVersion={isCurrentVersion}
                             // getDocumentContentById={getDocumentContentById}
-                            // isLoading={isDocumentsFetching && !artifact.content}
+                            isLoading={isDocumentsFetching && !artifact.content}
                             // metadata={metadata}
                             // setMetadata={setMetadata}
                             />

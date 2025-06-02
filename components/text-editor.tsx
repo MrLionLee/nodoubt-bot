@@ -12,15 +12,14 @@ type EditorProps = {
     content: string;
     onSaveContent: (updatedContent: string, debounce: boolean) => void;
     status: 'streaming' | 'idle';
-    isCurrentVersion: boolean;
-    currentVersionIndex: number;
+    // isCurrentVersion: boolean;
+    // currentVersionIndex: number;
 };
 
-export function Editor({
+export function PureEditor({
     content,
     onSaveContent,
     status,
-    isCurrentVersion,
 }: EditorProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const editorRef = useRef<EditorView | null>(null);
@@ -80,14 +79,19 @@ export function Editor({
     useEffect(() => {
         if (editorRef.current && content) {
             const currentContent = buildContentFromDocument(editorRef.current.state.doc);
-
-            if (status === 'streaming') {
-                console.info('status === streaming')
-
-            }
-
-            if (currentContent !== content) {
-                console.info('currentContent  !== content')
+            // 当 result 的内容还处于 streaming 构建过程中，需要不停接受信息，然后进行更新
+            // 点击跳转展示不同内容时，需要同步内容, 需要切换 document
+            if (status === 'streaming' || currentContent !== content) {
+                const newDocument = buildDocumentFromContent(content);
+                // https://prosemirror.net/docs/ref/#transform.Transform.replaceWith
+                const transaction = editorRef.current.state.tr.replaceWith(
+                    0,
+                    editorRef.current.state.doc.content.size,
+                    newDocument.content,
+                  );
+                //  这个事务只是进行 doc 的切换，并非新增，所以不需要触发 onSaveContent；
+                  transaction.setMeta('no-save', true);
+                  editorRef.current.dispatch(transaction);
             }
 
         }
@@ -99,14 +103,13 @@ export function Editor({
     )
 }
 
-
-// type EditorProps = {
-//     content: string;
-//     isCurrentVersion: boolean;
-//     currentVersionIndex: number;
-//     status: 'streaming' | 'idle';
-//     onSaveContent:(updateContent:string, debounce: boolean) => void;
-// };
+export const Editor = memo(PureEditor, (prevProps: EditorProps, nextProps: EditorProps) => {
+    return (
+      !(prevProps.status === 'streaming' && nextProps.status === 'streaming') &&
+      prevProps.content === nextProps.content &&
+      prevProps.onSaveContent === nextProps.onSaveContent
+    );
+  });
 
 
 
