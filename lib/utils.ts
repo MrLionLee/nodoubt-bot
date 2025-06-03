@@ -1,7 +1,7 @@
 import { twMerge } from 'tailwind-merge';
 import { type ClassValue, clsx } from 'clsx';
 
-import {
+import type {
     UIMessage,
     CoreAssistantMessage,
     CoreToolMessage,

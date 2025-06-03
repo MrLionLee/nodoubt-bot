@@ -1,10 +1,9 @@
 import { PreviewMessage } from '@/components/chat/message';
 import { useScrollToBottom } from '@/components/use-scroll-to-bottom';
-import { UIMessage } from 'ai';
+import type { UIMessage } from 'ai';
 import { memo } from 'react';
-import equal from 'fast-deep-equal';
-import { UIArtifact } from './artifact';
-import { UseChatHelpers } from '@ai-sdk/react';
+import type { UIArtifact } from './artifact';
+import type { UseChatHelpers } from '@ai-sdk/react';
 
 interface ArtifactMessagesProps {
   chatId: string;
@@ -17,12 +16,8 @@ interface ArtifactMessagesProps {
 }
 
 function PureArtifactMessages({
-  chatId,
   status,
   messages,
-  setMessages,
-  reload,
-  isReadonly,
 }: ArtifactMessagesProps) {
   const [messagesContainerRef, messagesEndRef] =
     useScrollToBottom<HTMLDivElement>();

@@ -1,17 +1,17 @@
 
 
-import { and, asc, desc, eq, gt, lt, SQL } from 'drizzle-orm';
+import { and, asc, desc, eq, gt, lt, type SQL } from 'drizzle-orm';
 import { genSaltSync, hashSync } from 'bcrypt-ts';
 
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
-import { ArtifactKind } from '@/components/artifact/artifact';
+import type { ArtifactKind } from '@/components/artifact/artifact';
 
 
 import {
     chat,
-    Chat,
-    DBMessage,
+    type Chat,
+    type DBMessage,
     message,
     user,
     type User,

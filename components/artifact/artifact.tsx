@@ -26,7 +26,7 @@ import { useArtifact } from '@/hooks/use-artifact';
 // import { sheetArtifact } from '@/artifacts/sheet/client';
 import { textArtifact } from '@/artifacts/text/client';
 import equal from 'fast-deep-equal';
-import { UseChatHelpers } from '@ai-sdk/react';
+import type { UseChatHelpers } from '@ai-sdk/react';
 
 // 定义好的 artifacts 类型
 export const artifactDefinitions = [
@@ -81,7 +81,7 @@ function PureArtifact({
     reload: UseChatHelpers['reload'];
     isReadonly: boolean;
 }) {
-    const { artifact, setArtifact, metadata, setMetadata } = useArtifact();
+    const { artifact, setArtifact } = useArtifact();
     const {
         data: documents,
         isLoading: isDocumentsFetching,
@@ -93,9 +93,6 @@ function PureArtifact({
         fetcher,
     );
 
-    console.error('artifact is',artifact)
-
-    const [mode, setMode] = useState<'edit' | 'diff'>('edit');
     const [document, setDocument] = useState<Document | null>(null);
     const [currentVersionIndex, setCurrentVersionIndex] = useState(-1);
 
@@ -187,43 +184,6 @@ function PureArtifact({
         [document, debouncedHandleContentChange, handleContentChange],
     );
 
-    function getDocumentContentById(index: number) {
-        if (!documents) return '';
-        if (!documents[index]) return '';
-        return documents[index].content ?? '';
-    }
-
-    const handleVersionChange = (type: 'next' | 'prev' | 'toggle' | 'latest') => {
-        if (!documents) return;
-
-        if (type === 'latest') {
-            setCurrentVersionIndex(documents.length - 1);
-            setMode('edit');
-        }
-
-        if (type === 'toggle') {
-            setMode((mode) => (mode === 'edit' ? 'diff' : 'edit'));
-        }
-
-        if (type === 'prev') {
-            if (currentVersionIndex > 0) {
-                setCurrentVersionIndex((index) => index - 1);
-            }
-        } else if (type === 'next') {
-            if (currentVersionIndex < documents.length - 1) {
-                setCurrentVersionIndex((index) => index + 1);
-            }
-        }
-    };
-
-    const [isToolbarVisible, setIsToolbarVisible] = useState(false);
-
-    /*
-     * NOTE: if there are no documents, or if
-     * the documents are being fetched, then
-     * we mark it as the current version.
-     */
-
     const isCurrentVersion =
         documents && documents.length > 0
             ? currentVersionIndex === documents.length - 1
@@ -238,19 +198,6 @@ function PureArtifact({
     if (!artifactDefinition) {
         throw new Error('Artifact definition not found!');
     }
-
-    // 更新 suggestions
-    // useEffect(() => {
-    //     if (artifact.documentId !== 'init') {
-    //         if (artifactDefinition.initialize) {
-    //             artifactDefinition.initialize({
-    //                 documentId: artifact.documentId,
-    //                 setMetadata,
-    //             });
-    //         }
-    //     }
-    // }, [artifact.documentId, artifactDefinition, setMetadata]);
-
     return (
         <AnimatePresence>
             {artifact.isVisible && (

@@ -20,7 +20,6 @@ export const PurePreviewMessage = ({
   message: UIMessage;
   isLoading: boolean;
 }) => {
-  console.info('message', message)
   return (
     <AnimatePresence>
       <motion.div
@@ -95,8 +94,6 @@ export const PurePreviewMessage = ({
               if (type === 'tool-invocation') {
                 const { toolInvocation } = part
                 const { toolName, toolCallId, state } = toolInvocation
-                console.info('toolName', toolName)
-                console.info('state', state)
                 if (state === 'call') {
                   const { args } = toolInvocation;
 

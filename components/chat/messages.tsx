@@ -21,13 +21,8 @@ interface MessagesProps {
 }
 
 export function PureMessages({
-    chatId,
     status,
-    // votes,
     messages,
-    setMessages,
-    reload,
-    isReadonly,
 }: MessagesProps) {
 
     const [messagesContainerRef, messagesEndRef] =

@@ -1,37 +1,35 @@
-import { DataStreamDelta } from '../chat/data-stream-handler'
-import { ComponentType, Dispatch, SetStateAction } from 'react';
-import { UIArtifact } from './artifact';
+import type { DataStreamDelta } from '../chat/data-stream-handler'
+import type { ComponentType, Dispatch, SetStateAction } from 'react';
+import type { UIArtifact } from './artifact';
 
-interface ArtifactContent<M=any> {
+interface ArtifactContent{
     title: string;
     content: string;
     isLoading: boolean;
-    // mode: 'edit' | 'diff';
     status: 'idle' | 'streaming';
-    // metadata: M,
     onSaveContent: (updateContent: string, debounce: boolean) => void
 }
 
-type ArtifactConfig<T extends string, M = any> = {
+type ArtifactConfig<T extends string> = {
     kind: T;
     description: string;
-    content: ComponentType<ArtifactContent<M>>;
+    content: ComponentType<ArtifactContent>;
     onStreamPart: (args: {
         setArtifact: Dispatch<SetStateAction<UIArtifact>>;
         streamPart: DataStreamDelta;
       }) => void;
 }
 
-export class Artifact<T extends string, M =any> {
+export class Artifact<T extends string> {
     readonly kind: T;
     readonly description: string;
-    readonly content: ComponentType<ArtifactContent<M>>;
+    readonly content: ComponentType<ArtifactContent>;
     readonly onStreamPart: (args: {
         setArtifact: Dispatch<SetStateAction<UIArtifact>>;
         streamPart: DataStreamDelta;
       }) => void;
 
-    constructor(config: ArtifactConfig<T,M>) {
+    constructor(config: ArtifactConfig<T>) {
         this.kind = config.kind;
         this.description= config.description;
         this.content = config.content;

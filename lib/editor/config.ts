@@ -4,7 +4,7 @@ import { schema } from 'prosemirror-schema-basic'
 import { textblockTypeInputRule } from 'prosemirror-inputrules'; // TODO 定制化生成更多的规则
 import type { Transaction } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view'
-import {  RefObject } from "react";
+import type {  RefObject } from "react";
 import { buildContentFromDocument } from "./function";
 
 export const documentSchema = new Schema({

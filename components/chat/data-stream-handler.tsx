@@ -2,7 +2,7 @@
 
 import { useChat } from "@ai-sdk/react";
 import { useEffect, useRef } from "react";
-import { artifactDefinitions, ArtifactKind } from '@/components/artifact/artifact'
+import { artifactDefinitions, type ArtifactKind } from '@/components/artifact/artifact'
 import { initialArtifactData, useArtifact } from '@/hooks/use-artifact';
 
 export type DataStreamDelta = {
@@ -15,7 +15,6 @@ export function DataStreamHandler({ id }: { id: string }) {
     // 只有
     const { data: dataStream } = useChat({ id });
     const { artifact, setArtifact } = useArtifact()
-    console.info('artifact.kind', artifact.kind)
     const lastProcessedIndex = useRef(-1)
     useEffect(() => {
         if (!dataStream?.length) return;
@@ -25,7 +24,6 @@ export function DataStreamHandler({ id }: { id: string }) {
 
 
         (newDeltas as DataStreamDelta[]).forEach((delta: DataStreamDelta) => {
-            console.info('delta.type', delta.type)
             const artifactDefinition = artifactDefinitions.find(
                 (artifactDefinition) => artifactDefinition.kind === artifact.kind,
             );

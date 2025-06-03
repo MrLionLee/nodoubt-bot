@@ -1,5 +1,5 @@
 import {
-  UIMessage,
+  type UIMessage,
   createDataStreamResponse,
   appendResponseMessages,
   smoothStream,
@@ -159,7 +159,7 @@ export async function POST(request: Request) {
       },
     });
   } catch (error) {
-    return new Response('An error occurred while processing your request!' + error, {
+    return new Response(`An error occurred while processing your request!${error}`, {
       status: 404,
     });
   }

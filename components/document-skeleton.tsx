@@ -1,12 +1,13 @@
 'use client';
 
-import { ArtifactKind } from '@/components/artifact/artifact';
+import type { ArtifactKind } from '@/components/artifact/artifact';
 
 export const DocumentSkeleton = ({
   artifactKind,
 }: {
   artifactKind: ArtifactKind;
 }) => {
+  console.info('DocumentSkeleton', artifactKind);
   return (
     <div className="flex flex-col gap-4 w-full">
       <div className="animate-pulse rounded-lg h-12 bg-muted-foreground/20 w-1/2" />
