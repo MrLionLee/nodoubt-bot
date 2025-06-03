@@ -6,12 +6,12 @@ import { generateUUID } from '@/lib/utils';
 import type { UIMessage, Attachment } from 'ai'
 import { useState } from 'react';
 import { Messages } from '@/components/chat/messages';
-import  { useSWRConfig } from 'swr';
+import { useSWRConfig } from 'swr';
 import { unstable_serialize } from 'swr/infinite';
 import { getChatHistoryPaginationKey } from '@/components/sidebar/sidebar-history';
 import { toast } from 'sonner';
 import { ChatHeader } from '@/components/chat/chat-header';
-
+import { Artifact } from '@/components/artifact/artifact';
 
 export function Chat({ id,
   initialMessages,
@@ -53,38 +53,57 @@ export function Chat({ id,
     },
   });
   return (
-    <div className="flex flex-col min-w-0 h-dvh bg-background">
+    <>
+      <div className="flex flex-col min-w-0 h-dvh bg-background">
         <ChatHeader
           selectedModelId={selectedChatModel}
           isReadonly={isReadonly}
         />
-      <Messages
+        <Messages
+          chatId={id}
+          status={status}
+          // votes={votes}
+          messages={messages}
+          setMessages={setMessages}
+          reload={reload}
+          isReadonly={isReadonly}
+        // isArtifactVisible={isArtifactVisible}
+        />
+
+        <form className="flex mx-auto px-4 bg-background pb-4 md:pb-6 gap-2 w-full md:max-w-3xl">
+          <MultimodalInput
+            chatId={id}
+            input={input}
+            setInput={setInput}
+            handleSubmit={handleSubmit}
+            status={status}
+            stop={stop}
+            attachments={attachments}
+            setAttachments={setAttachments}
+            messages={messages}
+            setMessages={setMessages}
+            append={append}
+          />
+        </form>
+
+      </div>
+
+      <Artifact
         chatId={id}
+        input={input}
+        setInput={setInput}
+        handleSubmit={handleSubmit}
         status={status}
-        // votes={votes}
+        stop={stop}
+        attachments={attachments}
+        setAttachments={setAttachments}
+        append={append}
         messages={messages}
         setMessages={setMessages}
         reload={reload}
         isReadonly={isReadonly}
-      // isArtifactVisible={isArtifactVisible}
       />
+    </>
 
-      <form className="flex mx-auto px-4 bg-background pb-4 md:pb-6 gap-2 w-full md:max-w-3xl">
-        <MultimodalInput
-          chatId={id}
-          input={input}
-          setInput={setInput}
-          handleSubmit={handleSubmit}
-          status={status}
-          stop={stop}
-          attachments={attachments}
-          setAttachments={setAttachments}
-          messages={messages}
-          setMessages={setMessages}
-          append={append}
-        />
-      </form>
-
-    </div>
   );
 }

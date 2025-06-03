@@ -2,13 +2,13 @@ import Link from 'next/link';
 import React, { memo } from 'react';
 import ReactMarkdown, { type Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { CodeBlock } from './code-block';
+import { CodeBlock } from './chat/code-block';
 
 
 // markdown 定义
 const components: Partial<Components> = {
-  // @ts-expect-error
-  code: CodeBlock, // code 元素自定义
+  // @ts-expect-error   code 元素自定义
+  code: CodeBlock,
   pre: ({ children }) => <>{children}</>,
   ol: ({ children, ...props }) => {
     return (

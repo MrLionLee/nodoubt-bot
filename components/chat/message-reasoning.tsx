@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { ChevronDownIcon, LoaderIcon } from '@/components/icons';
 import { motion, AnimatePresence } from 'motion/react';
-import { Markdown } from '@/components/chat/markdown';
+import { Markdown } from '@/components/markdown';
 
 interface MessageReasoningProps {
   isLoading: boolean;

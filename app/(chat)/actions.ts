@@ -1,6 +1,6 @@
 'use server';
 
-import { generateText, Message } from 'ai';
+import { generateText, type Message } from 'ai';
 import { myProvider } from '@/lib/ai/providers';
 import { cookies } from 'next/headers';
 
