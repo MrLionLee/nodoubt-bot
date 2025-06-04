@@ -19,6 +19,7 @@ export const textDocumentHandler = createDocumentHandler<'text'>({
         })
 
         for await (const delta of fullStream) {
+            console.info('text delta', delta)
             const { type } = delta
             if (type === 'text-delta') {
                 const { textDelta } = delta

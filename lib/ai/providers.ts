@@ -11,7 +11,7 @@ import {
 } from './models.test';
 
 const deepseek = createDeepSeek({
-    baseURL: 'https://api.chataiapi.com/v1',
+    baseURL: 'https://www.chataiapi.com/v1',
     apiKey: process.env.DEEPSEEK_API_KEY,
 })
 
@@ -25,8 +25,7 @@ const kimiAI = createOpenAICompatible({
     name: 'moonshot',
     baseURL: "https://api.moonshot.cn/v1",
     apiKey: process.env.OPENAI_KIMI_API_KEY
-})('moonshot-v1-8k')
-
+})('moonshot-v1-8k-vision-preview')
 
 const testingProvider = customProvider({
     languageModels: {
@@ -48,8 +47,8 @@ export const myProvider = isTestEnvironment ? testingProvider :
             //         tagName:'think'
             //     })
             // }),
-            'title-model': deepseek('deepseek-chat'),
-            "artifact-model": deepseek('deepseek-chat')
+            'title-model': kimiAI,
+            "artifact-model":  deepseek('deepseek-chat')
         },
         imageModels: {
             // 'small-model': createOpenAI({

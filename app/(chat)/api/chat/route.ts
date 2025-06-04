@@ -1,9 +1,9 @@
 import {
   type UIMessage,
-  createDataStreamResponse,
   appendResponseMessages,
   smoothStream,
   streamText,
+  createDataStream
 } from 'ai';
 import {
   generateUUID,
@@ -17,10 +17,8 @@ import { getChatById, saveChat, saveMessages, deleteChatById } from '@/lib/db/qu
 import { generateTitleFromUserMessage } from '../../actions'
 import { auth } from '@/app/(auth)/auth';
 import { createDocument } from '@/lib/ai/tools/create-document';
-// import { updateDocument } from '@/lib/ai/tools/update-document';
-// import { requestSuggestions } from '@/lib/ai/tools/request-suggestions';
+import { updateDocument } from '@/lib/ai/tools/update-document';
 import { getWeather } from '@/lib/ai/tools/get-weather';
-
 
 export async function POST(request: Request) {
   try {
@@ -33,7 +31,6 @@ export async function POST(request: Request) {
       messages: Array<UIMessage>;
       selectedChatModel: string;
     } = await request.json();
-
     const session = await auth();
 
     if (!session || !session.user || !session.user.id) {
@@ -71,8 +68,10 @@ export async function POST(request: Request) {
       ],
     });
 
+
+
     // 调用 AI 模型进行对话
-    return createDataStreamResponse({
+    const stream = createDataStream({
       execute: (dataStream) => {
         // https://sdk.vercel.ai/docs/reference/ai-sdk-core/stream-text
         const result = streamText({
@@ -86,8 +85,7 @@ export async function POST(request: Request) {
               : [
                 'getWeather',
                 'createDocument',
-                // 'updateDocument',
-                // 'requestSuggestions',
+                'updateDocument',
               ],
           experimental_transform: smoothStream({ chunking: 'word' }),
           experimental_generateMessageId: generateUUID,
@@ -95,14 +93,7 @@ export async function POST(request: Request) {
           tools: {
             getWeather,
             createDocument: createDocument({ dataStream, session }),
-            // updateDocument: updateDocument({ session, dataStream }),
-            // requestSuggestions: requestSuggestions({
-            //   session,
-            //   dataStream,
-            // }),
-          },
-          onStepFinish: (step) => {
-            console.info('step  is -----', JSON.stringify(step, null, 2))
+            updateDocument: updateDocument({ session, dataStream }),
           },
           onFinish: async ({ response }) => {
             if (session.user?.id) {
@@ -158,6 +149,7 @@ export async function POST(request: Request) {
         return 'Oops, an error occurred!';
       },
     });
+    return new Response(stream)
   } catch (error) {
     return new Response(`An error occurred while processing your request!${error}`, {
       status: 404,

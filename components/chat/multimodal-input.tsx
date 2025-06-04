@@ -134,31 +134,65 @@ export function PureMultimodalInput({
     chatId,
   ]);
 
+  async function fileToBase64(file: File) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result); // 包含完整 Data URI
+      reader.onerror = error => reject(error);
+    });
+  }
+
+  
+
   const uploadFile = async (file: File) => {
     const formData = new FormData();
     formData.append('file', file);
 
-    try {
-      const response = await fetch('/api/files/upload', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        const { url, pathname, contentType } = data;
-
-        return {
-          url,
-          name: pathname,
-          contentType: contentType,
-        };
+    // 这里判断一下，如果允许读取 png，可以通过 blob 缓存图片，放置多次上传
+    // 如果模型不允许直接调用 png 格式的缓存图片，则转换成 base64，直接传输；
+    const disabledPngModel = true
+    if (disabledPngModel) {
+      // TODO attachments 限制
+      if (file.size > 1024 * 1024)  {
+        toast.error('图片大小不得超过 1M');
+      }else {
+        try {
+          // 将 url 转成 base64，部分 kimi-vision 不支持直接读取 png，所以要转成 base64 再输入模型
+          const base64Url = await fileToBase64(file)
+          return {
+            url: base64Url,
+            name: file.name,
+            contentType: file.type,
+          };
+        } catch (error) {
+          console.error(error);
+          toast.error('Failed to exchange the picture to base64, please try again!');
+        }
       }
-      const { error } = await response.json();
-      toast.error(error);
-    } catch (error) {
-      console.error(error);
-      toast.error('Failed to upload file, please try again!');
+    }else {
+      try {
+        const response = await fetch('/api/files/upload', {
+          method: 'POST',
+          body: formData,
+        });
+  
+        if (response.ok) {
+          const data = await response.json();
+          const { url, pathname, contentType } = data;
+  
+          return {
+            url,
+            name: pathname,
+            contentType: contentType,
+          };
+        }
+        const { error } = await response.json();
+        toast.error(error);
+      } catch (error) {
+        console.error(error);
+        toast.error('Failed to upload file, please try again!');
+      }
     }
   };
 
@@ -173,8 +207,7 @@ export function PureMultimodalInput({
         const uploadedAttachments = await Promise.all(uploadPromises);
         const successfullyUploadedAttachments = uploadedAttachments.filter(
           (attachment) => attachment !== undefined,
-        );
-
+        )
         setAttachments((currentAttachments) => [
           ...currentAttachments,
           ...successfullyUploadedAttachments,

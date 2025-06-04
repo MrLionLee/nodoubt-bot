@@ -75,7 +75,7 @@ export function PureEditor({
 
     }, [onSaveContent])
 
-
+    // 当 content 发生变化时，需要更新 editorView 的内容
     useEffect(() => {
         if (editorRef.current && content) {
             const currentContent = buildContentFromDocument(editorRef.current.state.doc);

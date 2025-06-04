@@ -5,6 +5,7 @@ import type { Session } from "next-auth";
 import { saveDocument } from '../db/queries';
 import type { Document } from '../db/schema';
 import { textDocumentHandler } from "@/artifacts/text/server";
+import { codeDocumentHandler } from "@/artifacts/code/server";
 
 export interface DocumentCallbackProps {
     session: Session;
@@ -65,6 +66,7 @@ export function createDocumentHandler<T extends ArtifactKind>(
 
 
 export const documentHandlersByArtifactKind: Array<DocumentHandler> = [
-    textDocumentHandler
+    textDocumentHandler,
+    codeDocumentHandler
 ]
 export const artifactKinds = ['text', 'code', 'image', 'sheet'] as const

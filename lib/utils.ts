@@ -63,3 +63,55 @@ export function getTrailingMessageId({
 
     return trailingMessage.id;
 }
+
+
+
+export function sanitizeResponseMessages({
+    messages,
+    reasoning,
+  }: {
+    messages: Array<ResponseMessage>;
+    reasoning: string | undefined;
+  }) {
+    const toolResultIds: Array<string> = [];
+  
+    for (const message of messages) {
+      if (message.role === 'tool') {
+        for (const content of message.content) {
+          if (content.type === 'tool-result') {
+            // 工具的最终产物需要展示， tool-call 不需要展示
+            toolResultIds.push(content.toolCallId);
+          }
+        }
+      }
+    }
+  
+    const messagesBySanitizedContent = messages.map((message) => {
+        // user message 不需要 sanitize
+      if (message.role !== 'assistant') return message;
+  
+      if (typeof message.content === 'string') return message;
+  
+      const sanitizedContent = message.content.filter((content) =>
+        content.type === 'tool-call'
+          ? toolResultIds.includes(content.toolCallId)
+          : content.type === 'text'
+            ? content.text.length > 0
+            : true,
+      );
+  
+      if (reasoning) {
+        // @ts-expect-error: reasoning message parts in sdk is wip
+        sanitizedContent.push({ type: 'reasoning', reasoning });
+      }
+  
+      return {
+        ...message,
+        content: sanitizedContent,
+      };
+    });
+  
+    return messagesBySanitizedContent.filter(
+      (message) => message.content.length > 0,
+    );
+  }

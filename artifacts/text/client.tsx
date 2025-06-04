@@ -12,7 +12,7 @@ export const textArtifact = new Artifact<'text'>({
         onSaveContent
     }) => {
         if (isLoading) {
-            return <DocumentSkeleton artifactKind="text" />;
+            return <DocumentSkeleton />;
         }
 
         return (

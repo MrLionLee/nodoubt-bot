@@ -22,26 +22,31 @@ export const createDocument = ({ session, dataStream }: CreateDocumentProps) =>
     }),
     execute: async ({ title, kind }) => {
       const id = generateUUID();
+      // 配置 kind
       dataStream.writeData({
         type: 'kind',
         content: kind,
       });
 
+      // 配置 id
       dataStream.writeData({
         type: 'id',
         content: id,
       });
 
+      // 配置 title
       dataStream.writeData({
         type: 'title',
         content: title,
       });
 
+      // 清楚之前的内容
       dataStream.writeData({
         type: 'clear',
         content: '',
       });
 
+      console.info('Creating document', title, kind);
       const documentHandler = documentHandlersByArtifactKind.find(
         (documentHandlerByArtifactKind) =>
           documentHandlerByArtifactKind.kind === kind,

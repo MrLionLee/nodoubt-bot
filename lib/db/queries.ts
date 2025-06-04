@@ -236,3 +236,18 @@ export async function getDocumentsById({ id }: { id: string }) {
       throw error;
     }
   }
+
+  export async function getDocumentById({id} : {id:string}){
+    try {
+        const [selectedDocument] = await db
+           .select()
+           .from(document)
+           .where(eq(document.id, id))
+           .orderBy(desc(document.createdAt));
+
+        return selectedDocument;
+    } catch (error) {
+        console.error('Failed to get document by id from database');
+        throw error;
+    }
+  }
