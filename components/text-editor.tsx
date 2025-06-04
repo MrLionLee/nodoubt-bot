@@ -75,7 +75,7 @@ export function PureEditor({
 
     }, [onSaveContent])
 
-
+    // 当 content 发生变化时，需要更新 editorView 的内容
     useEffect(() => {
         if (editorRef.current && content) {
             const currentContent = buildContentFromDocument(editorRef.current.state.doc);
@@ -104,6 +104,8 @@ export function PureEditor({
 }
 
 export const Editor = memo(PureEditor, (prevProps: EditorProps, nextProps: EditorProps) => {
+    console.info('revProps.content === nextProps.content',prevProps.content === nextProps.content)
+    console.info('prevProps.content === nextProps.content',prevProps.onSaveContent === nextProps.onSaveContent)
     return (
       !(prevProps.status === 'streaming' && nextProps.status === 'streaming') &&
       prevProps.content === nextProps.content &&

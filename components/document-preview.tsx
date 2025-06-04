@@ -4,7 +4,7 @@ import { useArtifact } from "@/hooks/use-artifact"
 import useSWR from 'swr';
 import { cn, fetcher } from '@/lib/utils';
 import { useMemo, memo, useCallback, useRef, useEffect } from "react";
-import type {  UIArtifact } from "@/components/artifact/artifact";
+import type { UIArtifact } from "@/components/artifact/artifact";
 import { LoaderIcon, FileIcon } from '@/components/icons'
 import { Editor } from '@/components/text-editor';
 import type { Document } from '@/lib/db/schema'
@@ -34,17 +34,19 @@ export function DocumentPreview({
     useEffect(() => {
         const boundingBox = hitboxRef.current?.getBoundingClientRect();
         if (artifact.documentId && boundingBox) {
-            setArtifact({
-                ...artifact,
-                boundingBox: {
-                    left: boundingBox.x,
-                    top: boundingBox.y,
-                    width: boundingBox.width,
-                    height: boundingBox.height,
-                },
-            })
+            setArtifact((preview) => (
+                {
+                    ...preview,
+                    boundingBox: {
+                        left: boundingBox.x,
+                        top: boundingBox.y,
+                        width: boundingBox.width,
+                        height: boundingBox.height,
+                    },
+                }
+            ))
         }
-    }, [artifact, artifact.documentId, setArtifact])
+    }, [artifact.documentId, setArtifact])
 
     if (artifact.isVisible) {
         // 展开 artifact 后，message 中的展示需要变更
@@ -116,13 +118,13 @@ const PureDocumentHeader = ({
                     <div className="animate-spin">
                         <LoaderIcon />
                     </div>
-                ) : 
-                // kind === 'image' ? (
-                //     <ImageIcon />
-                // ) : 
-                (
-                    <FileIcon />
-                )}
+                ) :
+                    // kind === 'image' ? (
+                    //     <ImageIcon />
+                    // ) : 
+                    (
+                        <FileIcon />
+                    )}
             </div>
             <div className="-translate-y-1 sm:translate-y-0 font-medium">{title}</div>
         </div>
@@ -157,11 +159,15 @@ const DocumentContent = ({ document }: { document: Document }) => {
         saveContent: () => { },
     };
 
+    const onSaveContent = useCallback(() => {
+        return () => { }
+    }, [])
+
     return (
         <div className={containerClassName}>
             {document.kind === 'text' ? (
                 // onSaveContent 不配置回调，因此在 chat 中是无法 save 的
-                <Editor {...commonProps} onSaveContent={() => { }} />
+                <Editor {...commonProps} onSaveContent={onSaveContent} />
             )
                 // : document.kind === 'code' ? (
                 //   <div className="flex flex-1 relative w-full">
