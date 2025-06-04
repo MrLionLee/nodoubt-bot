@@ -25,8 +25,7 @@ const kimiAI = createOpenAICompatible({
     name: 'moonshot',
     baseURL: "https://api.moonshot.cn/v1",
     apiKey: process.env.OPENAI_KIMI_API_KEY
-})('moonshot-v1-8k')
-
+})('moonshot-v1-8k-vision-preview')
 
 const testingProvider = customProvider({
     languageModels: {
