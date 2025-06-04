@@ -29,6 +29,7 @@ export function DocumentPreview({
         Array<Document>
     >(result ? `/api/document?id=${result.id}` : null, fetcher);
     const previewDocument = useMemo(() => documents?.[0], [documents]);
+    console.info('previewDocument', previewDocument)
     const hitboxRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {

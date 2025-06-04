@@ -25,13 +25,14 @@ import { useArtifact } from '@/hooks/use-artifact';
 // import { codeArtifact } from '@/artifacts/code/client';
 // import { sheetArtifact } from '@/artifacts/sheet/client';
 import { textArtifact } from '@/artifacts/text/client';
+import {codeArtifact} from "@/artifacts/code/client";
 import equal from 'fast-deep-equal';
 import type { UseChatHelpers } from '@ai-sdk/react';
 
 // 定义好的 artifacts 类型
 export const artifactDefinitions = [
     textArtifact,
-    // codeArtifact,
+    codeArtifact,
     // imageArtifact,
     // sheetArtifact,
 ];
@@ -94,7 +95,7 @@ function PureArtifact({
     );
 
     const [document, setDocument] = useState<Document | null>(null);
-    const [currentVersionIndex, setCurrentVersionIndex] = useState(-1);
+    // const [currentVersionIndex, setCurrentVersionIndex] = useState(-1);
 
     const { open: isSidebarOpen } = useSidebar();
 
@@ -104,7 +105,7 @@ function PureArtifact({
 
             if (mostRecentDocument) {
                 setDocument(mostRecentDocument);
-                setCurrentVersionIndex(documents.length - 1);
+                // setCurrentVersionIndex(documents.length - 1);
                 setArtifact((currentArtifact) => ({
                     ...currentArtifact,
                     content: mostRecentDocument.content ?? '',
@@ -184,10 +185,10 @@ function PureArtifact({
         [document, debouncedHandleContentChange, handleContentChange],
     );
 
-    const isCurrentVersion =
-        documents && documents.length > 0
-            ? currentVersionIndex === documents.length - 1
-            : true;
+    // const isCurrentVersion =
+    //     documents && documents.length > 0
+    //         ? currentVersionIndex === documents.length - 1
+    //         : true;
 
     const { width: windowWidth, height: windowHeight } = useWindowSize();
 
@@ -245,7 +246,7 @@ function PureArtifact({
                             transition: { duration: 0 },
                         }}
                     >
-                        <AnimatePresence>
+                        {/* <AnimatePresence>
                             {!isCurrentVersion && (
                                 <motion.div
                                     className="left-0 absolute h-dvh w-[400px] top-0 bg-zinc-900/50 z-50"
@@ -254,7 +255,7 @@ function PureArtifact({
                                     exit={{ opacity: 0 }}
                                 />
                             )}
-                        </AnimatePresence>
+                        </AnimatePresence> */}
 
                         <div className="flex flex-col h-full justify-between items-center gap-4">
                             <ArtifactMessages
@@ -386,7 +387,6 @@ function PureArtifact({
                             // metadata={metadata}
                             // setMetadata={setMetadata}
                             />
-
                             {/* <AnimatePresence>
                                 {isCurrentVersion && (
                                     <Toolbar
@@ -422,6 +422,5 @@ export const Artifact = memo(PureArtifact, (prevProps, nextProps) => {
     if (prevProps.status !== nextProps.status) return false;
     if (prevProps.input !== nextProps.input) return false;
     if (!equal(prevProps.messages, nextProps.messages.length)) return false;
-
     return true;
 });

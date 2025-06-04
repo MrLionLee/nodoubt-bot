@@ -12,7 +12,7 @@ function PureArtifactCloseButton() {
       variant="outline"
       className="h-fit p-2 dark:hover:bg-zinc-700"
       onClick={() => {
-        setArtifact((currentArtifact) => {
+        setArtifact((currentArtifact) => { 
           return currentArtifact.status === 'streaming'
             ? {
               ...currentArtifact,

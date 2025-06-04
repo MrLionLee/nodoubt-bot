@@ -104,8 +104,6 @@ export function PureEditor({
 }
 
 export const Editor = memo(PureEditor, (prevProps: EditorProps, nextProps: EditorProps) => {
-    console.info('revProps.content === nextProps.content',prevProps.content === nextProps.content)
-    console.info('prevProps.content === nextProps.content',prevProps.onSaveContent === nextProps.onSaveContent)
     return (
       !(prevProps.status === 'streaming' && nextProps.status === 'streaming') &&
       prevProps.content === nextProps.content &&

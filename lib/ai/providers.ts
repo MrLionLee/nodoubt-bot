@@ -11,7 +11,7 @@ import {
 } from './models.test';
 
 const deepseek = createDeepSeek({
-    baseURL: 'https://api.chataiapi.com/v1',
+    baseURL: 'https://www.chataiapi.com/v1',
     apiKey: process.env.DEEPSEEK_API_KEY,
 })
 
@@ -48,8 +48,8 @@ export const myProvider = isTestEnvironment ? testingProvider :
             //         tagName:'think'
             //     })
             // }),
-            'title-model': deepseek('deepseek-chat'),
-            "artifact-model": deepseek('deepseek-chat')
+            'title-model': kimiAI,
+            "artifact-model":  deepseek('deepseek-chat')
         },
         imageModels: {
             // 'small-model': createOpenAI({
